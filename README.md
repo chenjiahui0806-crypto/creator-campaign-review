@@ -4,7 +4,7 @@ A post-publish analytics tool that tells a sponsored-content creator which stage
 
 This project originated from firsthand experience managing social media accounts and running brand deals. It exists to close a gap creators face today: there is no systematic way to analyze sponsored content performance after publishing, attribute the likely cause, and turn that into a concrete action for the next piece.
 
-**Live demo:** replace this line with your GitHub Pages link once Pages is enabled, e.g. `https://<your-username>.github.io/creator-campaign-review/prototypes/`
+**Live demo:** https://chenjiahui0806-crypto.github.io/creator-campaign-review/prototypes/
 
 ## What this is
 
@@ -19,9 +19,11 @@ Three design constraints run through the whole product:
 ## Repository structure
 
 ```
-/prd          Product requirements document (13 sections)
-/prototypes   Interactive HTML prototypes — calendar and detail pages, wired to navigate between each other
-/skills       AI Skill and Framework architecture for the analysis engine
+/prd            Product requirements document (13 sections)
+/prototypes     Interactive HTML prototypes — calendar, detail, and entry pages, wired to navigate between each other
+/skills         AI Skill and Framework architecture for the analysis engine
+/sql            The engine's queries: schema, baseline calculation, deviation reading, R1-R7 rule evaluation, data validation
+/verification   A script that generates synthetic data and checks the R1-R7 rules actually fire the way the spec describes
 ```
 
 ### /prd
@@ -30,11 +32,18 @@ Three design constraints run through the whole product:
 Key decisions: reading window at day 2 for rate metrics, 7 fixed attribution rules (R1–R7) so every conclusion traces to a rule with a measurable hit rate, confidence tiers (High ≥12 comparable pieces, Medium 8–11, Low 2–7, None <2), gross commercial figures at P0 with refund rate deferred to P1, and single-dimension audience analysis with purchase propensity expressed in words.
 
 ### /prototypes
-- `index.html` — entry point for the live demo, links to both pages below.
-- `page1_calendar.html` — month and day calendar views, color-coded by order-conversion reading against baseline.
+- `index.html` — redirects straight into the calendar, the live-demo entry point.
+- `page1_calendar.html` — month and day calendar views, color-coded by order-conversion reading against baseline. The day view's prev/next arrows step through that month's pieces; a "New content entry" link opens the entry form.
 - `page2_detail.html` — diagnosis at the top, action list, conversion funnel with per-stage definitions, stage deviation chart, commercial metrics, audience-vs-buyers comparison, opening retention curve, engagement stats, and post-publish validation verdict.
+- `page3_entry.html` — the M2 content-entry form: required identifying fields up top, optional funnel/content/commercial/audience fields grouped below. A static mock — the "Save piece" button confirms visually but doesn't persist anywhere, since there's no backend behind this prototype yet.
 
 Clicking a piece on the calendar navigates to its detail page. The detail page's content is currently a fixed example dataset; the navigation already carries a `piece` identifier through the URL, so wiring in a real per-piece data source is a drop-in change rather than a redesign.
+
+### /sql
+Six queries implementing the engine described in `/skills`: schema, comparable-set selection, baseline percentile calculation, stage deviation reading, R1-R7 rule evaluation, and pre-save data validation. See `sql/README.md` for how they chain together and which PRD section each one implements.
+
+### /verification
+A script that generates synthetic baseline history and seven rule-testing pieces, then checks the R1-R7 attribution logic fires correctly against each one — 7/7 currently pass. See `verification/README.md` for details.
 
 ### /skills
 `skill-framework.md` documents the analysis engine in three parts: the 10-step platform flow, the three Skill specifications (Data Validation, Locate & Attribute, Recommend & Validate), and the implementation spec (data model, funnel definitions, metric formulas, the R1–R7 rule table, confidence tiers).
@@ -44,7 +53,9 @@ The design principle: SQL and code handle every deterministic calculation. Skill
 ## Status
 
 - PRD: final draft, 13 sections complete.
-- Prototypes: two pages built and linked; content is a static example dataset pending a real backend.
-- Skill/Framework architecture: documented, not yet implemented.
+- Prototypes: three pages built and linked (calendar, detail, entry); content is a static example dataset pending a real backend.
+- Skill/Framework architecture: documented.
+- SQL: schema and core queries written directly off the PRD's field definitions, not yet run against a live database.
+- Verification: R1-R7 attribution logic tested against synthetic data, 7/7 rules firing as specified.
 
 See `CHANGELOG.md` for version history and `Issues` for open questions and planned work.

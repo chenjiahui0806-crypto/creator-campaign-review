@@ -1,0 +1,76 @@
+======================================================================
+BASELINE — 20 comparable organic TikTok pieces, confidence: high
+======================================================================
+  store_visit_rate          p25=0.1186  p50=0.1285  p75=0.1370
+  click_rate                p25=0.5105  p50=0.5790  p75=0.6226
+  order_conversion_rate     p25=0.1782  p50=0.1972  p75=0.2319
+  completion_3s             p25=0.6630  p50=0.7275  p75=0.7895
+  completion_rate           p25=0.2900  p50=0.3330  p75=0.3725
+  avg_watch_time            p25=12.4250  p50=14.0000  p75=15.5500
+  arpu                      p25=1.4974  p50=1.8364  p75=2.1131
+  gmv_per_click             p25=12.2802  p50=14.9613  p75=20.0276
+  aov                       p25=39.8431  p50=45.2336  p75=49.2755
+
+======================================================================
+RULE VERIFICATION — one target piece per rule
+======================================================================
+
+target-R1-weak-hook  (expected R1)
+  funnel: store_visit_rate=0.090 (below), click_rate=0.630 (above), order_conversion_rate=0.193 (within)
+  weak stage located: store_visit  (gaps: store_visit=1.55, click=0.00, order=0.00)
+  -> FIRED R1 [view/content]: completion_3s=0.52 below baseline p25=0.66
+  -> FIRED R7 [audience/content]: arpu=1.21 below baseline p25=1.50, order_conversion_rate within/above
+  PASS: True
+
+target-R2-midroll-drop  (expected R2)
+  funnel: store_visit_rate=0.093 (below), click_rate=0.643 (above), order_conversion_rate=0.193 (within)
+  weak stage located: store_visit  (gaps: store_visit=1.37, click=0.00, order=0.00)
+  -> FIRED R2 [view/content]: completion_rate=0.19 below baseline p25=0.29, completion_3s within
+  -> FIRED R7 [audience/content]: arpu=1.22 below baseline p25=1.50, order_conversion_rate within/above
+  PASS: True
+
+target-R3-attention-not-intent  (expected R3)
+  funnel: store_visit_rate=0.080 (below), click_rate=0.650 (above), order_conversion_rate=0.200 (within)
+  weak stage located: store_visit  (gaps: store_visit=2.09, click=0.00, order=0.00)
+  -> FIRED R3 [store_visit/content]: store_visit_rate=0.08 below baseline p25=0.12, retention and completion both within
+  -> FIRED R7 [audience/content]: arpu=1.03 below baseline p25=1.50, order_conversion_rate within/above
+  PASS: True
+
+target-R4-page-drop  (expected R4)
+  funnel: store_visit_rate=0.128 (within), click_rate=0.417 (below), order_conversion_rate=0.198 (within)
+  weak stage located: click  (gaps: store_visit=0.00, click=0.84, order=0.00)
+  -> FIRED R4 [click/commercial]: click_rate=0.42 below baseline p25=0.51, store_visit_rate within
+  PASS: True
+
+target-R5-offer-weak  (expected R5)
+  funnel: store_visit_rate=0.193 (above), click_rate=0.569 (within), order_conversion_rate=0.090 (below)
+  weak stage located: order  (gaps: store_visit=0.00, click=0.00, order=1.65)
+  -> FIRED R5 [order/commercial]: gmv_per_click=4.12 below baseline p25=12.28
+  PASS: True
+
+target-R6-weak-cta  (expected R6)
+  funnel: store_visit_rate=0.193 (above), click_rate=0.569 (within), order_conversion_rate=0.076 (below)
+  weak stage located: order  (gaps: store_visit=0.00, click=0.00, order=1.91)
+  -> FIRED R6 [order/content]: order_conversion_rate=0.08 below baseline p25=0.18, click_rate and gmv_per_click both within
+  PASS: True
+
+target-R7-wrong-audience  (expected R7)
+  funnel: store_visit_rate=0.136 (within), click_rate=0.567 (within), order_conversion_rate=0.203 (within)
+  weak stage located: store_visit  (gaps: store_visit=0.00, click=0.00, order=0.00)
+  -> FIRED R7 [audience/content]: arpu=0.58 below baseline p25=1.50, order_conversion_rate within/above
+  PASS: True
+
+======================================================================
+SUMMARY
+======================================================================
+  [PASS] target-R1-weak-hook: expected R1, fired ['R1', 'R7']
+  [PASS] target-R2-midroll-drop: expected R2, fired ['R2', 'R7']
+  [PASS] target-R3-attention-not-intent: expected R3, fired ['R3', 'R7']
+  [PASS] target-R4-page-drop: expected R4, fired ['R4']
+  [PASS] target-R5-offer-weak: expected R5, fired ['R5']
+  [PASS] target-R6-weak-cta: expected R6, fired ['R6']
+  [PASS] target-R7-wrong-audience: expected R7, fired ['R7']
+
+7/7 target pieces triggered their intended rule.
+
+Files written: baseline_history.json/csv, target_pieces.json, baseline_summary.json
