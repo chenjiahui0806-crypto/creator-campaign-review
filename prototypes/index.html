@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creator Campaign Review — Prototype</title>
+<style>
+  :root{ --ink:#16181d; --sub:#6a7078; --line:#e7e9ee; --self:#3d5afe; --bg:#eceef2; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;}
+  .card{background:#fff;border-radius:16px;padding:40px 44px;max-width:520px;width:90%;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .brand{font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.01em;}
+  h1{font-size:22px;font-weight:800;margin-top:6px;letter-spacing:-.01em;}
+  p{font-size:13px;color:var(--sub);margin-top:10px;line-height:1.6;}
+  .links{margin-top:26px;display:flex;flex-direction:column;gap:10px;}
+  a.entry{display:block;padding:14px 18px;border:1px solid var(--line);border-radius:10px;text-decoration:none;color:var(--ink);font-size:14px;font-weight:600;transition:border-color .12s;}
+  a.entry:hover{border-color:var(--self);}
+  a.entry span{display:block;font-size:12px;font-weight:400;color:var(--sub);margin-top:3px;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">Creator Campaign Review</div>
+    <h1>Prototype demo</h1>
+    <p>A post-publish analytics tool that tells a sponsored-content creator which stage of their conversion funnel underperformed, why it likely happened, and what to change on the next piece.</p>
+    <div class="links">
+      <a class="entry" href="page1_calendar.html">Open the calendar
+        <span>Browse published pieces by month or day and tap any piece to open its review.</span>
+      </a>
+      <a class="entry" href="page2_detail.html">Open a review directly
+        <span>Diagnosis, funnel, commercial and audience panels, and post-publish validation.</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
