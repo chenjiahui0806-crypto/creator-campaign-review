@@ -58,6 +58,58 @@ const CCR = (() => {
       completion3s: 60, completionRate: 29, avgWatchTime: 10.8,
       gmv: 6930, unitPrice: 55, discount: 0,
       viewerFemale: 72, buyerFemale: 90 },
+
+    // ---- expanded set: covers every R1-R7 rule, a boosted piece (separate
+    // baseline from organic), and a second platform (RedNote) building its
+    // own baseline from scratch. See /verification for how these were tuned.
+    { id: 'nut-brand-snack-box-unboxing', platform: 'TikTok', product: 'Nut Brand', campaign: 'Snack Box Unboxing',
+      publishedAt: '2026-07-04T18:00', format: 'unboxing', boost: 'organic',
+      impressions: 15600, views: 10100, storeVisits: 1400, clicks: 855, orders: 225,
+      completion3s: 72, completionRate: 19, avgWatchTime: 9.6,
+      gmv: 9900, unitPrice: 44, discount: 0,
+      viewerFemale: 64, buyerFemale: 71 },
+    { id: 'air-fryer-brand-flash-sale-push', platform: 'TikTok', product: 'Air Fryer Brand', campaign: 'Flash Sale Push',
+      publishedAt: '2026-07-06T20:00', format: 'unboxing', boost: 'boosted',
+      impressions: 42000, views: 31000, storeVisits: 5200, clicks: 3100, orders: 780,
+      completion3s: 69, completionRate: 31, avgWatchTime: 13.2,
+      gmv: 140400, unitPrice: 180, discount: 15,
+      viewerFemale: 56, buyerFemale: 59 },
+    { id: 'drink-brand-cold-brew-review', platform: 'TikTok', product: 'Drink Brand', campaign: 'Cold Brew Review',
+      publishedAt: '2026-07-10T09:30', format: 'daily_share', boost: 'organic',
+      impressions: 15900, views: 10300, storeVisits: 1220, clicks: 705, orders: 170,
+      completion3s: 70, completionRate: 33, avgWatchTime: 13.7,
+      gmv: 7480, unitPrice: 44, discount: 0,
+      viewerFemale: 59, buyerFemale: 61 },
+    { id: 'skincare-brand-5-step-routine', platform: 'RedNote', product: 'Skincare Brand', campaign: '5-Step Routine',
+      publishedAt: '2026-07-12T21:00', format: 'unboxing', boost: 'organic',
+      impressions: 12800, views: 9200, storeVisits: 1350, clicks: 790, orders: 230,
+      completion3s: 78, completionRate: 41, avgWatchTime: 16.5,
+      gmv: 16560, unitPrice: 72, discount: 0,
+      viewerFemale: 88, buyerFemale: 91 },
+    { id: 'skincare-brand-nighttime-ritual', platform: 'RedNote', product: 'Skincare Brand', campaign: 'Nighttime Ritual',
+      publishedAt: '2026-07-16T22:30', format: 'daily_share', boost: 'organic',
+      impressions: 13100, views: 9500, storeVisits: 1400, clicks: 818, orders: 95,
+      completion3s: 80, completionRate: 43, avgWatchTime: 17.0,
+      gmv: 16760, unitPrice: 72, discount: 0,
+      viewerFemale: 87, buyerFemale: 88 },
+    { id: 'skincare-brand-glass-skin-tutorial', platform: 'RedNote', product: 'Skincare Brand', campaign: 'Glass Skin Tutorial',
+      publishedAt: '2026-07-19T20:00', format: 'unboxing', boost: 'organic',
+      impressions: 13000, views: 9350, storeVisits: 1370, clicks: 800, orders: 222,
+      completion3s: 79, completionRate: 42, avgWatchTime: 16.8,
+      gmv: 15990, unitPrice: 72, discount: 0,
+      viewerFemale: 89, buyerFemale: 90 },
+    { id: 'nut-brand-protein-bites-debut', platform: 'TikTok', product: 'Nut Brand', campaign: 'Protein Bites Debut',
+      publishedAt: '2026-07-20T17:45', format: 'unboxing', boost: 'organic',
+      impressions: 15700, views: 10200, storeVisits: 1500, clicks: 610, orders: 210,
+      completion3s: 71, completionRate: 33, avgWatchTime: 13.9,
+      gmv: 9240, unitPrice: 44, discount: 0,
+      viewerFemale: 65, buyerFemale: 72 },
+    { id: 'drink-brand-iced-latte-recipe', platform: 'TikTok', product: 'Drink Brand', campaign: 'Iced Latte Recipe',
+      publishedAt: '2026-07-24T13:15', format: 'daily_share', boost: 'organic',
+      impressions: 15850, views: 10250, storeVisits: 1510, clicks: 900, orders: 200,
+      completion3s: 70, completionRate: 32, avgWatchTime: 13.5,
+      gmv: 4200, unitPrice: 44, discount: 0,
+      viewerFemale: 60, buyerFemale: 62 },
   ];
 
   // ---------------------------------------------------------------------
@@ -206,6 +258,7 @@ const CCR = (() => {
     if (ordered[0][1] > 0) {
       weakStage = ordered[0][0];
       for (const [stage, g] of ordered.slice(1)) {
+        if (g <= 0) continue; // not actually below baseline — not a real tie
         const order = ['storeVisit', 'click', 'order'];
         if (Math.abs(g - ordered[0][1]) < 0.15 && order.indexOf(stage) < order.indexOf(weakStage)) {
           weakStage = stage;
