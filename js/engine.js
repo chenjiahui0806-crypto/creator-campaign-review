@@ -7,6 +7,7 @@
 
 const CCR = (() => {
   const STORAGE_KEY = 'ccr_user_pieces_v1';
+  const HIDE_SEED_KEY = 'ccr_hide_seed_v1';
 
   // ---------------------------------------------------------------------
   // Seed history: the 7 pieces already shown on the July 2026 calendar
@@ -78,7 +79,16 @@ const CCR = (() => {
   }
 
   function getAllPieces() {
-    return [...SEED_PIECES, ...getUserPieces()];
+    return isSeedHidden() ? getUserPieces() : [...SEED_PIECES, ...getUserPieces()];
+  }
+
+  function isSeedHidden() {
+    return localStorage.getItem(HIDE_SEED_KEY) === '1';
+  }
+
+  function setSeedHidden(hidden) {
+    if (hidden) localStorage.setItem(HIDE_SEED_KEY, '1');
+    else localStorage.removeItem(HIDE_SEED_KEY);
   }
 
   function getPieceById(id) {
@@ -245,5 +255,6 @@ const CCR = (() => {
     return sameProduct[0] || null;
   }
 
-  return { getAllPieces, getUserPieces, saveUserPiece, getPieceById, getPreviousPiece, derive, computeBaseline, confidenceLabel, reading, diagnose };
+  return { getAllPieces, getUserPieces, saveUserPiece, getPieceById, getPreviousPiece,
+    isSeedHidden, setSeedHidden, derive, computeBaseline, confidenceLabel, reading, diagnose };
 })();

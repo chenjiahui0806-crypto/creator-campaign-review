@@ -95,6 +95,29 @@
 
   <div class="demo-note"><b>Working demo, browser-only.</b> "Save piece" writes to this browser's local storage and computes a real diagnosis using the R1-R7 rules — nothing is sent to a server, and nobody else can see it. Clear your browser data and it's gone. The grid on the calendar page only renders July 2026, so a piece published outside that month won't appear there visually, but it still counts toward the baseline.</div>
 
+  <div class="section" style="margin-top:16px;">
+    <div class="section-head">
+      <div class="st">
+        <div class="name">Bulk import from spreadsheet</div>
+        <div class="desc">Upload a CSV or Excel file to add several pieces at once instead of filling the form below one at a time.</div>
+      </div>
+      <span class="opt-flag">Optional</span>
+    </div>
+    <div class="section-body">
+      <div class="hint" style="margin-bottom:10px;">
+        Columns expected (first row must be these exact headers): <code>platform, product, campaign, published_at, format, boost, impressions, views, store_visits, clicks, orders, completion_3s, avg_watch_time, completion_rate, saves, shares, comments, gmv, unit_price, discount, viewer_female, buyer_female</code>.
+        Only the first five are required — leave others blank if you don't have them. <code>published_at</code> should look like <code>2026-07-15 19:30</code>. <code>format</code> is <code>unboxing</code> or <code>daily_share</code>. <code>boost</code> is <code>organic</code> or <code>boosted</code>.
+      </div>
+      <input type="file" id="f-bulkfile" accept=".csv,.xlsx,.xls" style="font-size:12px;">
+      <button class="save-btn" id="parseBtn" style="width:auto;padding:9px 18px;margin:0 0 0 10px;display:inline-block;">Parse file</button>
+      <div id="bulkPreview" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div class="section-head" style="margin-top:22px;border:none;padding:0;">
+    <div class="st"><div class="name" style="font-size:16px;">Or enter one piece manually</div></div>
+  </div>
+
   <div class="layout">
     <div>
 
@@ -232,6 +255,7 @@
 
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/engine.js"></script>
 <script>
   const $ = id => document.getElementById(id);
@@ -257,6 +281,90 @@
   updateRail();
 
   function num(id){ const v = $(id).value; return v === '' ? null : Number(v); }
+
+  // ---------------------------------------------------------------------
+  // Bulk import
+  // ---------------------------------------------------------------------
+  const REQUIRED_COLS = ['platform', 'product', 'campaign', 'published_at', 'format'];
+  const ALL_COLS = ['platform','product','campaign','published_at','format','boost',
+    'impressions','views','store_visits','clicks','orders','completion_3s','avg_watch_time',
+    'completion_rate','saves','shares','comments','gmv','unit_price','discount','viewer_female','buyer_female'];
+  const NUMERIC_COLS = ['impressions','views','store_visits','clicks','orders','completion_3s',
+    'avg_watch_time','completion_rate','saves','shares','comments','gmv','unit_price','discount',
+    'viewer_female','buyer_female'];
+
+  let parsedRows = [];
+
+  function rowToPiece(row, idx){
+    const missing = REQUIRED_COLS.filter(c => !row[c] && row[c] !== 0);
+    const dateOk = row.published_at && !isNaN(new Date(row.published_at).getTime());
+    if (!dateOk) missing.push('published_at (unrecognized date)');
+
+    const piece = {
+      id: 'import-' + Date.now() + '-' + idx,
+      platform: row.platform, product: row.product, campaign: row.campaign,
+      publishedAt: dateOk ? new Date(row.published_at).toISOString().slice(0,16) : null,
+      format: (row.format || '').trim() === 'daily_share' ? 'daily_share' : 'unboxing',
+      boost: (row.boost || '').trim() === 'boosted' ? 'boosted' : 'organic',
+    };
+    const COL_TO_FIELD = {
+      impressions: 'impressions', views: 'views', store_visits: 'storeVisits', clicks: 'clicks', orders: 'orders',
+      completion_3s: 'completion3s', avg_watch_time: 'avgWatchTime', completion_rate: 'completionRate',
+      saves: 'saves', shares: 'shares', comments: 'comments', gmv: 'gmv', unit_price: 'unitPrice',
+      discount: 'discount', viewer_female: 'viewerFemale', buyer_female: 'buyerFemale',
+    };
+    NUMERIC_COLS.forEach(c => {
+      const key = COL_TO_FIELD[c];
+      const v = row[c];
+      piece[key] = (v === '' || v == null) ? null : Number(v);
+    });
+    return { piece, valid: missing.length === 0, missing, raw: row };
+  }
+
+  $('parseBtn').onclick = () => {
+    const file = $('f-bulkfile').files[0];
+    if (!file){ alert('Choose a CSV or Excel file first.'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
+      parsedRows = rows.map(rowToPiece);
+      renderPreview();
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  function renderPreview(){
+    if (!parsedRows.length){
+      $('bulkPreview').innerHTML = '<div style="font-size:12px;color:var(--faint);">No rows found in that file.</div>';
+      return;
+    }
+    const validCount = parsedRows.filter(r => r.valid).length;
+    let html = `<div style="font-size:12px;margin-bottom:10px;"><b>${validCount} / ${parsedRows.length}</b> rows look ready to import.</div>`;
+    html += '<div style="max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px;">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:11px;">';
+    html += '<tr style="background:#fafbfc;"><th style="text-align:left;padding:6px 8px;">Row</th><th style="text-align:left;padding:6px 8px;">Product / Campaign</th><th style="text-align:left;padding:6px 8px;">Published</th><th style="text-align:left;padding:6px 8px;">Status</th></tr>';
+    parsedRows.forEach((r, i) => {
+      const statusHtml = r.valid
+        ? '<span style="color:var(--above);font-weight:700;">Ready</span>'
+        : `<span style="color:var(--below);font-weight:700;">Missing: ${r.missing.join(', ')}</span>`;
+      html += `<tr style="border-top:1px solid var(--hair);"><td style="padding:6px 8px;">${i+1}</td><td style="padding:6px 8px;">${r.piece.product || '—'} / ${r.piece.campaign || '—'}</td><td style="padding:6px 8px;">${r.piece.publishedAt || r.raw.published_at || '—'}</td><td style="padding:6px 8px;">${statusHtml}</td></tr>`;
+    });
+    html += '</table></div>';
+    if (validCount > 0){
+      html += `<button class="save-btn" id="importBtn" style="width:auto;padding:9px 18px;margin-top:12px;">Import ${validCount} ready row${validCount>1?'s':''}</button>`;
+    }
+    $('bulkPreview').innerHTML = html;
+    if (validCount > 0){
+      $('importBtn').onclick = () => {
+        parsedRows.filter(r => r.valid).forEach(r => CCR.saveUserPiece(r.piece));
+        alert(`Imported ${validCount} piece${validCount>1?'s':''}. Taking you to the calendar.`);
+        location.href = 'page1_calendar.html';
+      };
+    }
+  }
 
   $('saveBtn').onclick = () => {
     const platform = $('f-platform').value;
