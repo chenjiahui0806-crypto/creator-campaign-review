@@ -105,8 +105,7 @@
     </div>
     <div class="section-body">
       <div class="hint" style="margin-bottom:10px;">
-        Columns expected (first row must be these exact headers): <code>platform, product, campaign, published_at, format, boost, impressions, views, store_visits, clicks, orders, completion_3s, avg_watch_time, completion_rate, saves, shares, comments, gmv, unit_price, discount, viewer_female, buyer_female</code>.
-        Only the first five are required — leave others blank if you don't have them. <code>published_at</code> should look like <code>2026-07-15 19:30</code>. <code>format</code> is <code>unboxing</code> or <code>daily_share</code>. <code>boost</code> is <code>organic</code> or <code>boosted</code>.
+        Upload any spreadsheet with a header row — column names don't need to match exactly (spacing, capitalization, and underscores are all fine, e.g. "Store Visits" or "store_visits" both work), and they can be in any order. After parsing, every cell below is editable, so anything not recognized or left blank in your file can be typed in directly before importing. Required columns are shown in bold: platform, product, campaign, published at, format.
       </div>
       <input type="file" id="f-bulkfile" accept=".csv,.xlsx,.xls" style="font-size:12px;">
       <button class="save-btn" id="parseBtn" style="width:auto;padding:9px 18px;margin:0 0 0 10px;display:inline-block;">Parse file</button>
@@ -285,40 +284,104 @@
   // ---------------------------------------------------------------------
   // Bulk import
   // ---------------------------------------------------------------------
-  const REQUIRED_COLS = ['platform', 'product', 'campaign', 'published_at', 'format'];
-  const ALL_COLS = ['platform','product','campaign','published_at','format','boost',
-    'impressions','views','store_visits','clicks','orders','completion_3s','avg_watch_time',
-    'completion_rate','saves','shares','comments','gmv','unit_price','discount','viewer_female','buyer_female'];
-  const NUMERIC_COLS = ['impressions','views','store_visits','clicks','orders','completion_3s',
-    'avg_watch_time','completion_rate','saves','shares','comments','gmv','unit_price','discount',
-    'viewer_female','buyer_female'];
+  const REQUIRED_COLS = ['platform', 'product', 'campaign', 'publishedAt', 'format'];
+  const COLUMN_DEFS = [
+    { key: 'platform', label: 'Platform', required: true, type: 'text' },
+    { key: 'product', label: 'Product', required: true, type: 'text' },
+    { key: 'campaign', label: 'Campaign', required: true, type: 'text' },
+    { key: 'publishedAt', label: 'Published at', required: true, type: 'datetime' },
+    { key: 'format', label: 'Format', required: true, type: 'text' },
+    { key: 'boost', label: 'Boost', required: false, type: 'text' },
+    { key: 'impressions', label: 'Impressions', required: false, type: 'number' },
+    { key: 'views', label: 'Views', required: false, type: 'number' },
+    { key: 'storeVisits', label: 'Store visits', required: false, type: 'number' },
+    { key: 'clicks', label: 'Clicks', required: false, type: 'number' },
+    { key: 'orders', label: 'Orders', required: false, type: 'number' },
+    { key: 'completion3s', label: '3s completion %', required: false, type: 'number' },
+    { key: 'avgWatchTime', label: 'Avg watch (s)', required: false, type: 'number' },
+    { key: 'completionRate', label: 'Completion %', required: false, type: 'number' },
+    { key: 'saves', label: 'Saves', required: false, type: 'number' },
+    { key: 'shares', label: 'Shares', required: false, type: 'number' },
+    { key: 'comments', label: 'Comments', required: false, type: 'number' },
+    { key: 'gmv', label: 'GMV', required: false, type: 'number' },
+    { key: 'unitPrice', label: 'Unit price', required: false, type: 'number' },
+    { key: 'discount', label: 'Discount %', required: false, type: 'number' },
+    { key: 'viewerFemale', label: 'Viewer % F', required: false, type: 'number' },
+    { key: 'buyerFemale', label: 'Buyer % F', required: false, type: 'number' },
+  ];
 
-  let parsedRows = [];
+  // Accepts near-enough header spellings: case/space/underscore/punctuation
+  // insensitive, plus a few common synonyms, so a file doesn't have to match
+  // the template character-for-character to be recognized.
+  const HEADER_ALIASES = {
+    platform: ['platform'],
+    product: ['product', 'productname', 'brand'],
+    campaign: ['campaign', 'campaignname', 'title', 'contenttitle'],
+    publishedAt: ['publishedat', 'published', 'publishdate', 'date', 'publishtime'],
+    format: ['format', 'contentformat', 'type'],
+    boost: ['boost', 'booststatus', 'boosted'],
+    impressions: ['impressions', 'impression'],
+    views: ['views', 'view'],
+    storeVisits: ['storevisits', 'storevisit', 'visits'],
+    clicks: ['clicks', 'click'],
+    orders: ['orders', 'order'],
+    completion3s: ['completion3s', '3scompletion', 'completion3'],
+    avgWatchTime: ['avgwatchtime', 'averagewatchtime', 'watchtime'],
+    completionRate: ['completionrate', 'completion'],
+    saves: ['saves', 'save'],
+    shares: ['shares', 'share'],
+    comments: ['comments', 'comment'],
+    gmv: ['gmv', 'revenue'],
+    unitPrice: ['unitprice', 'price'],
+    discount: ['discount'],
+    viewerFemale: ['viewerfemale', 'viewersfemale', 'viewerpercentfemale'],
+    buyerFemale: ['buyerfemale', 'buyersfemale', 'buyerpercentfemale'],
+  };
 
-  function rowToPiece(row, idx){
-    const missing = REQUIRED_COLS.filter(c => !row[c] && row[c] !== 0);
-    const dateOk = row.published_at && !isNaN(new Date(row.published_at).getTime());
-    if (!dateOk) missing.push('published_at (unrecognized date)');
+  function normalizeHeader(h){
+    return String(h).toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
 
-    const piece = {
-      id: 'import-' + Date.now() + '-' + idx,
-      platform: row.platform, product: row.product, campaign: row.campaign,
-      publishedAt: dateOk ? new Date(row.published_at).toISOString().slice(0,16) : null,
-      format: (row.format || '').trim() === 'daily_share' ? 'daily_share' : 'unboxing',
-      boost: (row.boost || '').trim() === 'boosted' ? 'boosted' : 'organic',
-    };
-    const COL_TO_FIELD = {
-      impressions: 'impressions', views: 'views', store_visits: 'storeVisits', clicks: 'clicks', orders: 'orders',
-      completion_3s: 'completion3s', avg_watch_time: 'avgWatchTime', completion_rate: 'completionRate',
-      saves: 'saves', shares: 'shares', comments: 'comments', gmv: 'gmv', unit_price: 'unitPrice',
-      discount: 'discount', viewer_female: 'viewerFemale', buyer_female: 'buyerFemale',
-    };
-    NUMERIC_COLS.forEach(c => {
-      const key = COL_TO_FIELD[c];
-      const v = row[c];
-      piece[key] = (v === '' || v == null) ? null : Number(v);
+  function buildHeaderMap(headers){
+    const map = {}; // raw header -> canonical key
+    headers.forEach(h => {
+      const norm = normalizeHeader(h);
+      const match = Object.entries(HEADER_ALIASES).find(([key, aliases]) => aliases.includes(norm));
+      if (match) map[h] = match[0];
     });
-    return { piece, valid: missing.length === 0, missing, raw: row };
+    return map;
+  }
+
+  function rowFromRaw(raw, headerMap){
+    const row = {};
+    Object.entries(raw).forEach(([h, v]) => {
+      const key = headerMap[h];
+      if (key) row[key] = String(v ?? '').trim();
+    });
+    return row;
+  }
+
+  let gridRows = []; // array of { key: value } piece-shaped objects, editable
+
+  function toPiece(row, idx){
+    const dateVal = row.publishedAt;
+    const dateOk = dateVal && !isNaN(new Date(dateVal.replace(' ', 'T')).getTime());
+    const piece = { id: 'import-' + Date.now() + '-' + idx };
+    COLUMN_DEFS.forEach(c => {
+      let v = row[c.key];
+      if (v === undefined || v === '') { piece[c.key] = c.key === 'format' ? 'unboxing' : c.key === 'boost' ? 'organic' : null; return; }
+      if (c.type === 'number') piece[c.key] = isNaN(Number(v)) ? null : Number(v);
+      else if (c.key === 'publishedAt') piece[c.key] = dateOk ? v.replace(' ', 'T').slice(0,16) : v;
+      else if (c.key === 'format') piece[c.key] = v.trim() === 'daily_share' ? 'daily_share' : 'unboxing';
+      else if (c.key === 'boost') piece[c.key] = v.trim() === 'boosted' ? 'boosted' : 'organic';
+      else piece[c.key] = v;
+    });
+    return piece;
+  }
+
+  function rowIsValid(piece){
+    return REQUIRED_COLS.every(k => piece[k] !== null && piece[k] !== '' && piece[k] !== undefined)
+      && !isNaN(new Date(String(piece.publishedAt).replace(' ','T')).getTime());
   }
 
   $('parseBtn').onclick = () => {
@@ -329,41 +392,57 @@
       const data = new Uint8Array(e.target.result);
       const wb = XLSX.read(data, { type: 'array' });
       const sheet = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
-      parsedRows = rows.map(rowToPiece);
-      renderPreview();
+      const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
+      if (!rawRows.length){ $('bulkPreview').innerHTML = '<div style="font-size:12px;color:var(--faint);">No rows found in that file.</div>'; return; }
+      const headerMap = buildHeaderMap(Object.keys(rawRows[0]));
+      gridRows = rawRows.map((raw, i) => toPiece(rowFromRaw(raw, headerMap), i));
+      renderGrid();
     };
     reader.readAsArrayBuffer(file);
   };
 
-  function renderPreview(){
-    if (!parsedRows.length){
-      $('bulkPreview').innerHTML = '<div style="font-size:12px;color:var(--faint);">No rows found in that file.</div>';
-      return;
-    }
-    const validCount = parsedRows.filter(r => r.valid).length;
-    let html = `<div style="font-size:12px;margin-bottom:10px;"><b>${validCount} / ${parsedRows.length}</b> rows look ready to import.</div>`;
-    html += '<div style="max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px;">';
-    html += '<table style="width:100%;border-collapse:collapse;font-size:11px;">';
-    html += '<tr style="background:#fafbfc;"><th style="text-align:left;padding:6px 8px;">Row</th><th style="text-align:left;padding:6px 8px;">Product / Campaign</th><th style="text-align:left;padding:6px 8px;">Published</th><th style="text-align:left;padding:6px 8px;">Status</th></tr>';
-    parsedRows.forEach((r, i) => {
-      const statusHtml = r.valid
-        ? '<span style="color:var(--above);font-weight:700;">Ready</span>'
-        : `<span style="color:var(--below);font-weight:700;">Missing: ${r.missing.join(', ')}</span>`;
-      html += `<tr style="border-top:1px solid var(--hair);"><td style="padding:6px 8px;">${i+1}</td><td style="padding:6px 8px;">${r.piece.product || '—'} / ${r.piece.campaign || '—'}</td><td style="padding:6px 8px;">${r.piece.publishedAt || r.raw.published_at || '—'}</td><td style="padding:6px 8px;">${statusHtml}</td></tr>`;
+  function renderGrid(){
+    const validCount = gridRows.filter(rowIsValid).length;
+    let html = `<div style="font-size:12px;margin-bottom:10px;">Recognized ${gridRows.length} row${gridRows.length>1?'s':''}. <b>${validCount}</b> ready to import — edit any cell below to fill in what wasn't recognized, columns in bold are required.</div>`;
+    html += '<div style="max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:8px;">';
+    html += '<table style="border-collapse:collapse;font-size:11px;white-space:nowrap;">';
+    html += '<tr style="background:#fafbfc;position:sticky;top:0;"><th style="padding:6px 8px;text-align:left;">#</th>';
+    COLUMN_DEFS.forEach(c => { html += `<th style="padding:6px 8px;text-align:left;${c.required?'font-weight:800;':'font-weight:400;color:var(--faint);'}">${c.label}</th>`; });
+    html += '<th style="padding:6px 8px;">Status</th></tr>';
+    gridRows.forEach((piece, i) => {
+      const ok = rowIsValid(piece);
+      html += `<tr style="border-top:1px solid var(--hair);" data-row="${i}">`;
+      html += `<td style="padding:4px 8px;color:var(--faint);">${i+1}</td>`;
+      COLUMN_DEFS.forEach(c => {
+        const val = piece[c.key] == null ? '' : piece[c.key];
+        html += `<td style="padding:2px 4px;"><input data-row="${i}" data-key="${c.key}" value="${String(val).replace(/"/g,'&quot;')}" style="width:${c.type==='datetime'?'130px':c.key==='campaign'||c.key==='product'?'130px':'70px'};font-size:11px;padding:4px 6px;border:1px solid var(--line);border-radius:5px;"></td>`;
+      });
+      html += `<td style="padding:4px 8px;" data-status="${i}">${ok ? '<span style="color:var(--above);font-weight:700;">Ready</span>' : '<span style="color:var(--below);font-weight:700;">Incomplete</span>'}</td>`;
+      html += '</tr>';
     });
     html += '</table></div>';
-    if (validCount > 0){
-      html += `<button class="save-btn" id="importBtn" style="width:auto;padding:9px 18px;margin-top:12px;">Import ${validCount} ready row${validCount>1?'s':''}</button>`;
-    }
+    html += `<button class="save-btn" id="importBtn" style="width:auto;padding:9px 18px;margin-top:12px;">Import ready rows</button>`;
     $('bulkPreview').innerHTML = html;
-    if (validCount > 0){
-      $('importBtn').onclick = () => {
-        parsedRows.filter(r => r.valid).forEach(r => CCR.saveUserPiece(r.piece));
-        alert(`Imported ${validCount} piece${validCount>1?'s':''}. Taking you to the calendar.`);
-        location.href = 'page1_calendar.html';
-      };
-    }
+
+    $('bulkPreview').querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const r = Number(inp.dataset.row), k = inp.dataset.key;
+        const def = COLUMN_DEFS.find(c => c.key === k);
+        gridRows[r][k] = def.type === 'number' ? (inp.value === '' ? null : Number(inp.value)) : inp.value;
+        const ok = rowIsValid(gridRows[r]);
+        document.querySelector(`[data-status="${r}"]`).innerHTML = ok
+          ? '<span style="color:var(--above);font-weight:700;">Ready</span>'
+          : '<span style="color:var(--below);font-weight:700;">Incomplete</span>';
+      });
+    });
+
+    $('importBtn').onclick = () => {
+      const ready = gridRows.filter(rowIsValid);
+      if (!ready.length){ alert('No rows are ready yet — fill in the required columns first.'); return; }
+      ready.forEach(p => CCR.saveUserPiece(p));
+      alert(`Imported ${ready.length} piece${ready.length>1?'s':''}. Taking you to the calendar.`);
+      location.href = 'page1_calendar.html';
+    };
   }
 
   $('saveBtn').onclick = () => {
