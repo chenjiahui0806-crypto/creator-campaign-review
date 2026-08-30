@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How It Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#241d18; --sub:#8b8178; --faint:#b3a99d; --line:#e9ddd0; --hair:#f3ece2;
+    --bg:#fdf6ee; --card:#ffffff;
+    --above:#3d9668; --below:#c2483f; --within:#a89c8d; --amber:#c98a2b;
+    --above-bg:#e6f2ea; --below-bg:#f9e6e3; --within-bg:#f1ece4;
+    --self:#e8583a; --accent-soft:#fbe4da;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html, body{height:100%;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;overflow:hidden;}
+  .display{font-family:"Fraunces",Georgia,serif;font-weight:700;letter-spacing:-.015em;}
+
+  .frame{padding:34px;height:100vh;}
+  .shell{max-width:1400px;margin:0 auto;background:#f0c39e;border-radius:28px;padding:14px;display:flex;gap:14px;height:100%;overflow:hidden;}
+  .sidebar{width:220px;flex-shrink:0;background:#faf3ea;border-radius:20px;padding:26px 20px;display:flex;flex-direction:column;height:100%;overflow-y:auto;}
+  .sb-brand{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;}
+  .sb-brand .dot{width:9px;height:9px;border-radius:50%;background:var(--self);display:inline-block;}
+  .sb-profile{margin-top:32px;}
+  .sb-cta{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;padding:13px;border-radius:14px;background:var(--self);color:#fff;font-size:14px;font-weight:800;text-decoration:none;box-shadow:0 4px 10px -3px rgba(232,88,58,.45);}
+  .sb-cta:hover{filter:brightness(1.05);}
+  .sb-cta .plus{font-size:17px;line-height:1;}
+  .sb-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--self),#f4a06f);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;}
+  .sb-name{font-size:14px;font-weight:800;margin-top:10px;}
+  .sb-role{font-size:11px;color:var(--sub);margin-top:1px;}
+  .sb-nav{margin-top:26px;display:flex;flex-direction:column;gap:4px;}
+  .sb-nav a{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-nav a .ic{width:16px;text-align:center;}
+  .sb-nav a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-nav a.active .ic{color:var(--self);}
+  .sb-foot-group{margin-top:auto;display:flex;flex-direction:column;gap:2px;}
+  .sb-foot-group a{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--faint);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-foot-group a:hover{background:var(--hair);color:var(--sub);}
+  .maincard{flex:1;background:var(--card);border-radius:20px;padding:30px 34px 40px;height:100%;overflow-y:auto;}
+
+  .h1{font-size:32px;}
+  .h-sub{font-size:13px;color:var(--sub);margin-top:8px;max-width:640px;line-height:1.6;}
+
+  .sec{margin-top:34px;}
+  .sec-h{font-size:19px;}
+  .sec-p{font-size:13px;color:var(--sub);margin-top:8px;max-width:680px;line-height:1.65;}
+
+  .stat-row{display:flex;gap:40px;margin-top:22px;}
+  .stat .k{font-size:11px;color:var(--sub);font-weight:600;}
+  .stat .v{font-size:26px;font-weight:800;margin-top:6px;}
+  .stat .v span{font-size:14px;color:var(--faint);font-weight:600;}
+
+  .rules{margin-top:20px;display:flex;flex-direction:column;gap:8px;}
+  .rule-row{display:flex;align-items:center;gap:14px;padding:12px 16px;border:1px solid var(--line);border-radius:11px;}
+  .rule-id{width:34px;height:34px;border-radius:10px;background:var(--accent-soft);color:var(--self);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .rule-body{flex:1;}
+  .rule-name{font-size:13px;font-weight:700;}
+  .rule-desc{font-size:11.5px;color:var(--sub);margin-top:2px;}
+  .rule-count{font-size:12px;font-weight:800;color:var(--ink);white-space:nowrap;}
+  .rule-count .lbl{font-size:9px;font-weight:600;color:var(--faint);display:block;text-align:right;}
+
+  .conf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;}
+  .conf-card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .conf-card .tag{font-size:10px;font-weight:800;padding:3px 9px;border-radius:12px;display:inline-block;}
+  .conf-card .n{font-size:11px;color:var(--sub);margin-top:8px;}
+  .conf-card.high .tag{background:var(--above-bg);color:var(--above);}
+  .conf-card.medium .tag{background:#fdf3e3;color:var(--amber);}
+  .conf-card.low .tag, .conf-card.none .tag{background:var(--below-bg);color:var(--below);}
+
+  .links{margin-top:18px;display:flex;flex-direction:column;gap:8px;}
+  .link-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border:1px solid var(--line);border-radius:11px;text-decoration:none;color:var(--ink);}
+  .link-row:hover{border-color:var(--self);}
+  .link-row .lt{font-size:13px;font-weight:700;}
+  .link-row .ld{font-size:11.5px;color:var(--sub);margin-top:2px;}
+  .link-row .arrow{color:var(--faint);}
+
+  .principle{border-left:3px solid var(--self);background:var(--accent-soft);border-radius:0 10px 10px 0;padding:14px 18px;margin-top:16px;font-size:13px;line-height:1.6;}
+  .principle b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--self);margin-bottom:4px;}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="shell">
+
+    <aside class="sidebar">
+      <div class="sb-brand"><span class="dot"></span>Campaign Review</div>
+      <div class="sb-profile">
+        <div class="sb-avatar">CJ</div>
+        <div class="sb-name">Creator Account</div>
+        <div class="sb-role">TikTok · Sponsored content</div>
+      </div>
+      <a class="sb-cta" href="page3_entry.html"><span class="plus">+</span>New Content</a>
+      <nav class="sb-nav">
+        <a href="page0_dashboard.html"><span class="ic">▦</span>Dashboard</a>
+        <a href="page1_calendar.html"><span class="ic">▤</span>Calendar</a>
+        <a href="page0_dashboard.html#recent-insights"><span class="ic">◔</span>Insight</a>
+        <a class="active" href="page5_how_it_works.html"><span class="ic">⚙</span>How it works</a>
+      </nav>
+      <div class="sb-foot-group">
+        <a href="#"><span>⚙</span>Settings</a>
+        <a href="#"><span>⏻</span>Log out</a>
+      </div>
+    </aside>
+
+    <main class="maincard">
+      <div class="h1 display">How it works</div>
+      <div class="h-sub">The plain-language version lives on the rest of the site. This page is for anyone curious about the logic underneath — the same math and rules that power every diagnosis, shown with real numbers from the data currently in this browser.</div>
+
+      <div class="sec">
+        <div class="sec-h display">The core idea</div>
+        <div class="sec-p">Every reading compares a piece only to that creator's own past pieces — never to other creators or an industry average. Different accounts have different follower counts, prices, and audiences, so an outside benchmark would mostly measure the wrong thing. TikTok and RedNote each keep a separate baseline, and boosted pieces never mix with organic ones, since paid reach isn't earned by the content.</div>
+        <div class="principle"><b>Why this matters</b>A piece isn't "good" or "bad" in the abstract — it's only above or below what's normal for that specific creator, on that specific platform, under the same boost conditions.</div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h display">Right now, in this browser</div>
+        <div class="sec-p">These numbers are computed live from whatever pieces exist in local storage — seed examples plus anything entered through the form or bulk import.</div>
+        <div class="stat-row" id="liveStats"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h display">The seven rules</div>
+        <div class="sec-p">A diagnosis never free-writes a reason. It locates the weakest stage of the funnel, then checks a fixed set of seven rules against that stage's evidence. Each rule has fired at least once in the current dataset — the count on the right is how many pieces triggered it, right now.</div>
+        <div class="rules" id="ruleList"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h display">Confidence, expressed honestly</div>
+        <div class="sec-p">A reading is only as good as how much history backs it. Rather than hide that, the confidence label says so directly.</div>
+        <div class="conf-grid">
+          <div class="conf-card high"><span class="tag">High</span><div class="n">12+ comparable pieces</div></div>
+          <div class="conf-card medium"><span class="tag">Medium</span><div class="n">8–11 comparable pieces</div></div>
+          <div class="conf-card low"><span class="tag">Low</span><div class="n">2–7 comparable pieces</div></div>
+          <div class="conf-card none"><span class="tag">None</span><div class="n">Fewer than 2</div></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h display">Go deeper</div>
+        <div class="sec-p">The full technical writeup, the SQL implementation, and the test suite that verifies the rules actually fire as designed all live in the GitHub repository.</div>
+        <div class="links">
+          <a class="link-row" href="https://github.com/chenjiahui0806-crypto/creator-campaign-review/blob/main/TECHNICAL.md" target="_blank">
+            <div><div class="lt">Technical overview</div><div class="ld">The detailed README — architecture, design decisions, repo structure</div></div>
+            <span class="arrow">→</span>
+          </a>
+          <a class="link-row" href="https://github.com/chenjiahui0806-crypto/creator-campaign-review/tree/main/prd" target="_blank">
+            <div><div class="lt">Product requirements</div><div class="ld">The 13-section PRD this entire product is built from</div></div>
+            <span class="arrow">→</span>
+          </a>
+          <a class="link-row" href="https://github.com/chenjiahui0806-crypto/creator-campaign-review/tree/main/sql" target="_blank">
+            <div><div class="lt">SQL</div><div class="ld">Schema, baseline calculation, and rule evaluation as real queries</div></div>
+            <span class="arrow">→</span>
+          </a>
+          <a class="link-row" href="https://github.com/chenjiahui0806-crypto/creator-campaign-review/tree/main/verification" target="_blank">
+            <div><div class="lt">Verification</div><div class="ld">The test that checks every rule actually fires as specified</div></div>
+            <span class="arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="js/engine.js"></script>
+<script>
+  const RULE_INFO = {
+    R1: { name: 'Weak opening', desc: 'The first few seconds didn\'t hold viewers.' },
+    R2: { name: 'Mid-video drop', desc: 'The opening held, but viewers left before the pitch.' },
+    R3: { name: 'Attention without intent', desc: 'Viewers stayed, but that didn\'t turn into a tap on the product.' },
+    R4: { name: 'Page or price friction', desc: 'People reached the product page but didn\'t click through.' },
+    R5: { name: 'Weak offer', desc: 'The people who clicked converted worse than usual — likely the price or product.' },
+    R6: { name: 'Not enough reason to buy', desc: 'Everything upstream read normal, but the piece itself didn\'t close the sale.' },
+    R7: { name: 'Wrong audience', desc: 'Conversion was normal, but revenue per viewer was low — reached people less likely to buy.' },
+  };
+
+  const all = CCR.getAllPieces();
+  const ruleCounts = {};
+  let firedCount = 0;
+  all.forEach(p => {
+    const d = CCR.diagnose(p.id);
+    if (d.fired.length) firedCount++;
+    d.fired.forEach(f => { ruleCounts[f.rule] = (ruleCounts[f.rule] || 0) + 1; });
+  });
+
+  document.getElementById('liveStats').innerHTML = `
+    <div class="stat"><div class="k">Total pieces</div><div class="v">${all.length}</div></div>
+    <div class="stat"><div class="k">Pieces with a rule fired</div><div class="v">${firedCount} <span>/ ${all.length}</span></div></div>
+    <div class="stat"><div class="k">Distinct rules seen</div><div class="v">${Object.keys(ruleCounts).length} <span>/ 7</span></div></div>
+  `;
+
+  document.getElementById('ruleList').innerHTML = Object.entries(RULE_INFO).map(([id, info]) => `
+    <div class="rule-row">
+      <div class="rule-id">${id}</div>
+      <div class="rule-body"><div class="rule-name">${info.name}</div><div class="rule-desc">${info.desc}</div></div>
+      <div class="rule-count">${ruleCounts[id] || 0}<span class="lbl">pieces now</span></div>
+    </div>
+  `).join('');
+</script>
+</body>
+</html>
