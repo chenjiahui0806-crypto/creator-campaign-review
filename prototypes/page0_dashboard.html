@@ -127,6 +127,7 @@
         <a class="active" href="page0_dashboard.html"><span class="left"><span class="ic">▦</span>Dashboard</span></a>
         <a href="page1_calendar.html"><span class="left"><span class="ic">▤</span>Calendar</span></a>
         <a href="#recent-insights"><span class="left"><span class="ic">◔</span>Insight</span></a>
+        <a href="page5_how_it_works.html"><span class="left"><span class="ic">⚙</span>How it works</span></a>
       </nav>
       <div class="sb-foot-group">
         <a href="#"><span>⚙</span>Settings</a>
@@ -162,10 +163,10 @@
         </div>
         <div class="callout">
           <div class="ring"></div>
-          <div class="cav">R1–7</div>
-          <div class="ct display">Rule hit rate<br><b id="hitRate">—</b></div>
-          <div class="cs">Share of fired rules confirmed by a follow-up piece. See <code>/verification</code> for the full run.</div>
-          <a class="cbtn" href="page1_calendar.html">Open calendar →</a>
+          <div class="cav">?</div>
+          <div class="ct display">How we diagnose<br>your posts</div>
+          <div class="cs">Every reading compares a post only to your own past posts — never to other creators. See exactly how it works.</div>
+          <a class="cbtn" href="page5_how_it_works.html">See how it works →</a>
         </div>
       </div>
 
@@ -241,7 +242,8 @@
   })();
 
   // ---- rule hit rate (approx, from verification-style pass rate if available; else static reference) ----
-  document.getElementById('hitRate').textContent = '7 / 7 tested';
+  // ---- rule hit rate callout removed in favor of a plain-language link to
+  // page5_how_it_works.html, which shows the real numbers for anyone curious ----
 
   // ---- strongest pieces (top 3 by order conversion rate) ----
   (function(){
