@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Review</title>
+<style>
+  :root{
+    --ink:#16181d; --sub:#6a7078; --faint:#9aa0a8; --line:#e7e9ee; --hair:#f1f3f6;
+    --bg:#ffffff; --card:#ffffff; --panel:#ffffff;
+    --above:#2f9e6f; --below:#d5544b; --within:#8a9099; --amber:#c98a2b;
+    --above-bg:#e6f4ec; --below-bg:#fbe9e7; --within-bg:#eef0f3; --amber-bg:#fbf1df;
+    --self:#3d5afe; --base:#c4cad4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45;}
+  .page{width:1080px;margin:0 auto;background:var(--card);min-height:900px;padding:22px 34px 34px;}
+
+  .back{font-size:12px;color:var(--self);font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-bottom:12px;text-decoration:none;}
+  .live-flag{display:inline-flex;align-items:center;gap:6px;margin-left:14px;padding:3px 10px;border-radius:12px;background:#eef1ff;color:var(--self);font-size:10px;font-weight:700;vertical-align:middle;}
+  .live-flag .dot{width:5px;height:5px;border-radius:50%;background:var(--self);}
+  .crumb{font-size:11px;color:var(--sub);}
+  .crumb b{color:var(--ink);}
+  .head-row{display:flex;justify-content:space-between;align-items:flex-start;margin-top:4px;padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .h-title{font-size:19px;font-weight:800;letter-spacing:-.01em;}
+  .h-sub{font-size:12px;color:var(--sub);margin-top:3px;}
+  .conf-pill{font-size:11px;font-weight:700;padding:5px 13px;border-radius:14px;background:var(--within-bg);color:var(--sub);white-space:nowrap;}
+  .conf-pill.high{background:var(--above-bg);color:var(--above);}
+  .conf-pill.medium{background:var(--amber-bg);color:var(--amber);}
+  .conf-pill.low, .conf-pill.none{background:var(--below-bg);color:var(--below);}
+  .head-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px;}
+  .htag{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;display:inline-flex;align-items:center;gap:5px;}
+  .htag::before{content:"";width:6px;height:6px;border-radius:50%;}
+  .htag.boost{background:#fdeee0;color:#b5741a;}
+  .htag.boost::before{background:#c07a1e;}
+  .htag.window{background:var(--within-bg);color:var(--sub);}
+  .htag.window::before{background:var(--faint);}
+
+  .diagnosis{margin-top:18px;border:1.5px solid #dee3ef;border-radius:16px;padding:22px 24px;background:#ffffff;}
+  .diag-eyebrow{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--self);}
+  .diag-stage{font-size:24px;font-weight:800;margin-top:7px;letter-spacing:-.015em;}
+  .diag-stage .badge{font-size:12px;font-weight:700;color:var(--below);background:var(--below-bg);padding:3px 10px;border-radius:8px;vertical-align:middle;margin-left:9px;}
+  .diag-stage .badge.above{color:var(--above);background:var(--above-bg);}
+  .diag-lead{font-size:13px;color:var(--sub);margin-top:8px;}
+  .diag-cols{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px;}
+  .diag-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:15px 17px;}
+  .dc-tag{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:5px;display:inline-block;margin-bottom:9px;}
+  .dc-tag.content{background:#eef1ff;color:var(--self);}
+  .dc-tag.commercial{background:#fdeee0;color:#c07a1e;}
+  .dc-factor{font-size:14px;font-weight:700;line-height:1.35;}
+  .dc-evi{font-size:12px;color:var(--sub);margin-top:7px;line-height:1.5;}
+  .diag-next{margin-top:16px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--above);border-radius:9px;padding:14px 17px;}
+  .dn-tag{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--above);}
+  .dn-text{font-size:14px;font-weight:600;margin-top:5px;}
+  .no-factor{font-size:13px;color:var(--sub);margin-top:14px;}
+
+  .sec-h{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);margin:26px 0 12px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+  .panel{border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+  .panel.full{grid-column:1/-1;}
+  .p-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;}
+  .p-title{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);}
+  .p-note{font-size:10px;color:var(--faint);}
+  .p-hint{font-size:11px;color:var(--faint);margin-bottom:13px;}
+
+  .f-stage{margin-bottom:11px;}
+  .f-row{display:flex;align-items:center;gap:12px;}
+  .f-lbl{width:150px;font-size:12px;font-weight:600;color:var(--ink);flex-shrink:0;display:flex;flex-direction:column;gap:2px;}
+  .f-lbl .f-def{font-size:9px;font-weight:400;color:var(--faint);line-height:1.25;}
+  .f-track{flex:1;background:var(--hair);border-radius:6px;height:30px;overflow:hidden;}
+  .f-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:12px;color:#fff;font-size:12px;font-weight:700;}
+  .f-meta{width:130px;flex-shrink:0;text-align:right;font-size:12px;display:flex;align-items:center;justify-content:flex-end;gap:6px;}
+  .f-meta .rate{font-weight:700;}
+  .f-calc{font-size:9px;color:var(--faint);margin-top:4px;padding-left:162px;}
+  .tag{display:inline-block;font-size:10px;font-weight:800;padding:1px 7px;border-radius:4px;margin-left:6px;}
+  .tag.above{background:var(--above-bg);color:var(--above);}
+  .tag.below{background:var(--below-bg);color:var(--below);}
+  .tag.within{background:var(--within-bg);color:var(--within);}
+  .tag.info{background:#eef0f3;color:var(--faint);}
+
+  .dev-panel{display:flex;flex-direction:column;height:100%;}
+  .dev-chart{display:flex;flex-direction:column;justify-content:space-around;flex:1;padding:14px 0;}
+  .dev-row{display:flex;align-items:center;gap:10px;font-size:12px;}
+  .dev-name{width:92px;color:var(--sub);flex-shrink:0;text-align:right;}
+  .dev-track{flex:1;height:30px;position:relative;}
+  .dev-track::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line);}
+  .dev-bar{position:absolute;top:5px;height:20px;border-radius:4px;}
+  .dev-bar.pos{left:50%;}
+  .dev-bar.neg{right:50%;}
+  .dev-lbl{position:absolute;top:5px;height:20px;display:flex;align-items:center;font-size:11px;font-weight:700;}
+  .dev-lbl.pos{left:50%;}
+  .dev-lbl.neg{right:50%;justify-content:flex-end;}
+  .dev-axis{display:flex;justify-content:space-between;font-size:9px;color:var(--faint);margin-top:6px;padding:0 92px 0 102px;}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:11px 13px;}
+  .stat .k{font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.03em;}
+  .stat .v{font-size:18px;font-weight:800;margin-top:3px;display:flex;align-items:center;gap:6px;}
+  .stat .sub{font-size:9px;color:var(--faint);margin-top:2px;}
+
+  .aud-row{margin-bottom:14px;}
+  .aud-lbl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;}
+  .aud-lbl .who{font-weight:600;}
+  .aud-lbl .prop{font-weight:700;}
+  .aud-bars{display:flex;flex-direction:column;gap:4px;}
+  .aud-bar{height:16px;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:#fff;}
+  .aud-key{font-size:11px;color:var(--sub);margin-top:4px;line-height:1.5;}
+
+  .legend{display:flex;gap:15px;font-size:11px;color:var(--sub);margin-bottom:8px;}
+  .legend i{display:inline-block;width:16px;height:2px;vertical-align:middle;margin-right:5px;}
+  .legend .s i{background:var(--self);} .legend .b i{background:var(--base);}
+
+  .val-row{display:flex;align-items:center;gap:13px;margin-bottom:10px;font-size:13px;}
+  .val-name{width:170px;color:var(--sub);flex-shrink:0;}
+  .val-old{font-weight:700;color:var(--faint);}
+  .val-new{font-weight:700;}
+  .val-new.above{color:var(--above);}
+  .val-new.below{color:var(--below);}
+  .val-arrow{color:var(--faint);}
+
+  .colorlegend{display:flex;flex-wrap:wrap;gap:16px;margin-top:22px;padding:13px 18px;background:var(--panel);border:1px solid var(--line);border-radius:11px;font-size:11px;color:var(--sub);}
+  .colorlegend span{display:flex;align-items:center;gap:6px;}
+  .sw{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+  .empty{margin-top:80px;text-align:center;color:var(--sub);font-size:13px;line-height:1.8;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a class="back" href="page1_calendar.html">‹ Back to calendar</a><span class="live-flag"><span class="dot"></span>Live diagnosis, computed from this browser's data</span>
+  <div id="content"></div>
+
+</div>
+
+<script src="js/engine.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  const pieceId = params.get('piece');
+  const el = document.getElementById('content');
+  const pct = v => v == null ? '—' : (v*100).toFixed(1) + '%';
+  const cny = v => v == null ? '—' : '¥' + v.toFixed(v < 10 ? 2 : 1);
+  const fmtDate = iso => new Date(iso).toLocaleString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'});
+
+  function tag(reading, extra){
+    if (!reading) return `<span class="tag info">${extra || 'no baseline'}</span>`;
+    const symbol = reading === 'above' ? '▲' : reading === 'below' ? '▼' : '≈';
+    return `<span class="tag ${reading}">${symbol} ${reading}</span>`;
+  }
+
+  function devPct(value, baseline){
+    if (value == null || baseline.p50 == null || baseline.p50 === 0) return null;
+    return (value - baseline.p50) / baseline.p50;
+  }
+  function devBar(name, value, metric, baseline){
+    const dp = devPct(value, baseline[metric]);
+    if (dp == null) return `<div class="dev-row"><span class="dev-name">${name}</span><span class="dev-track"></span><span style="font-size:10px;color:var(--faint);">no baseline yet</span></div>`;
+    const capped = Math.max(-0.5, Math.min(0.5, dp));
+    const widthPct = Math.abs(capped) * 100;
+    const pos = dp >= 0;
+    const color = dp >= 0 ? 'var(--above)' : 'var(--below)';
+    return `<div class="dev-row"><span class="dev-name">${name}</span><span class="dev-track">
+      <span class="dev-bar ${pos?'pos':'neg'}" style="width:${widthPct}%;background:${color}"></span>
+      <span class="dev-lbl ${pos?'pos':'neg'}" style="${pos?'left':'right'}:calc(50% + ${widthPct}% + 6px);color:${color}">${dp>=0?'+':''}${(dp*100).toFixed(0)}%</span>
+    </span></div>`;
+  }
+
+  if (!pieceId || !CCR.getPieceById(pieceId)){
+    el.innerHTML = '<div class="empty">No piece matches this id in this browser\'s storage.<br>It may have been entered on a different device — local storage does not sync across browsers.<br><br><a href="page3_entry.html" style="color:var(--self);">Enter a new piece</a></div>';
+  } else {
+    const d = CCR.diagnose(pieceId);
+    const p = d.piece;
+    const b = d.baseline;
+    document.title = `${p.product} — ${p.campaign}`;
+
+    let html = `
+      <div class="crumb">${p.product} &nbsp;›&nbsp; <b>${p.campaign}</b></div>
+      <div class="head-row">
+        <div>
+          <div class="h-title">${p.campaign}</div>
+          <div class="h-sub">${p.platform} · ${p.format === 'unboxing' ? 'Unboxing' : 'Daily Share'} · published ${fmtDate(p.publishedAt)}</div>
+          <div class="head-tags">
+            ${p.boost === 'boosted' ? '<span class="htag boost">Boosted · paid promotion ran on this piece</span>' : ''}
+            <span class="htag window">Computed live against ${d.sampleSize} comparable ${p.platform} pieces</span>
+          </div>
+        </div>
+        <div class="conf-pill ${d.confidence}">${d.confidence[0].toUpperCase()+d.confidence.slice(1)} confidence · ${d.sampleSize} comparable pieces</div>
+      </div>
+    `;
+
+    const stageLabel = { storeVisit: 'Store visit', click: 'Click', order: 'Order' };
+    const stageVal = d.weakStage === 'storeVisit' ? p.storeVisitRate : d.weakStage === 'click' ? p.clickRate : d.weakStage === 'order' ? p.orderConversionRate : null;
+    const stageDp = d.weakStage ? devPct(stageVal, b[d.weakStage === 'storeVisit' ? 'storeVisitRate' : d.weakStage === 'click' ? 'clickRate' : 'orderConversionRate']) : null;
+
+    html += `<section class="diagnosis">
+      <div class="diag-eyebrow">Diagnosis</div>
+      <div class="diag-stage">${d.weakStage ? `The drop is at the ${stageLabel[d.weakStage]} stage` : 'No stage reads clearly weak'}
+        ${stageDp != null ? `<span class="badge ${stageDp>=0?'above':''}">${stageDp>=0?'▲':'▼'} ${Math.abs(stageDp*100).toFixed(0)}% ${stageDp>=0?'above':'below'} baseline</span>` : ''}
+      </div>
+      <div class="diag-lead">${d.sampleSize < 2 ? 'Not enough comparable history yet to read this piece with confidence.' : d.fired.length ? "Evidence below is drawn from the fields entered for this piece, compared against this creator's own history." : 'Every measured signal reads within or above normal — nothing stands out to flag.'}</div>
+    `;
+
+    if (d.fired.length){
+      html += '<div class="diag-cols">';
+      d.fired.forEach(f => {
+        html += `<div class="diag-card">
+          <span class="dc-tag ${f.side}">${f.side === 'content' ? 'Content side · yours to fix' : 'Commercial side · the offer'}</span>
+          <div class="dc-factor">${f.text}</div>
+          <div class="dc-evi">${f.evidence}</div>
+        </div>`;
+      });
+      html += '</div>';
+      html += `<div class="diag-next">
+        <div class="dn-tag">What to try next</div>
+        <div class="dn-text">${d.fired[0].text} Address the ${d.fired[0].side} side first — it's the strongest signal in this review.</div>
+      </div>`;
+    } else if (d.sampleSize >= 2) {
+      html += '<div class="no-factor">No rule fired for this piece — nothing to act on from this review.</div>';
+    }
+    html += '</section>';
+
+    if (p.impressions != null && p.storeVisits != null){
+      const svWidth = (p.storeVisits / p.impressions * 100).toFixed(1);
+      const clWidth = p.storeVisits ? (p.clicks / p.impressions * 100).toFixed(1) : 0;
+      const orWidth = p.storeVisits ? (p.orders / p.impressions * 100).toFixed(1) : 0;
+      html += `
+        <div class="sec-h">Conversion path</div>
+        <div class="grid2">
+          <div class="panel">
+            <div class="p-head"><span class="p-title">Conversion Funnel</span></div>
+            <div class="p-hint">Rates compared to this creator's own baseline; counts shown for reference only.</div>
+            <div class="f-stage"><div class="f-row">
+              <div class="f-lbl">Impression<span class="f-def">times the piece was shown</span></div>
+              <div class="f-track"><div class="f-fill" style="width:100%;background:linear-gradient(90deg,#5a6cff,#8b98ff)">${p.impressions.toLocaleString()}</div></div>
+              <div class="f-meta"><span class="tag info">shown only</span></div>
+            </div></div>
+            <div class="f-stage"><div class="f-row">
+              <div class="f-lbl">Store visit<span class="f-def">tapped through to the product page</span></div>
+              <div class="f-track"><div class="f-fill" style="width:${svWidth}%;background:linear-gradient(90deg,#5a6cff,#8b98ff)">${p.storeVisits.toLocaleString()}</div></div>
+              <div class="f-meta"><span class="rate">${pct(p.storeVisitRate)}</span>${tag(d.readings.storeVisit)}</div>
+            </div><div class="f-calc">store visits ÷ impressions${b.storeVisitRate.p50!=null?` · your usual ~${pct(b.storeVisitRate.p50)}`:''}</div></div>
+            ${p.clicks!=null?`<div class="f-stage"><div class="f-row">
+              <div class="f-lbl">Click<span class="f-def">tapped buy or add-to-cart</span></div>
+              <div class="f-track"><div class="f-fill" style="width:${clWidth}%;background:linear-gradient(90deg,#5a6cff,#8b98ff)">${p.clicks.toLocaleString()}</div></div>
+              <div class="f-meta"><span class="rate">${pct(p.clickRate)}</span>${tag(d.readings.click)}</div>
+            </div><div class="f-calc">clicks ÷ store visits${b.clickRate.p50!=null?` · your usual ~${pct(b.clickRate.p50)}`:''}</div></div>`:''}
+            ${p.orders!=null?`<div class="f-stage"><div class="f-row">
+              <div class="f-lbl">Order<span class="f-def">paid and placed the order</span></div>
+              <div class="f-track"><div class="f-fill" style="width:${orWidth}%;background:${d.readings.order==='below'?'linear-gradient(90deg,#e06b62,#eb8f88)':'linear-gradient(90deg,#5a6cff,#8b98ff)'}">${p.orders.toLocaleString()}</div></div>
+              <div class="f-meta"><span class="rate">${pct(p.orderConversionRate)}</span>${tag(d.readings.order)}</div>
+            </div><div class="f-calc">orders ÷ store visits${b.orderConversionRate.p50!=null?` · your usual ~${pct(b.orderConversionRate.p50)}`:''}${d.weakStage==='order'?' · this is where the drop is':''}</div></div>`:''}
+          </div>
+          <div class="panel dev-panel">
+            <div class="p-head"><span class="p-title">Stage Deviation from Baseline</span></div>
+            <div class="p-hint">Where each stage sits against your normal range.</div>
+            <div class="dev-chart">
+              ${devBar('Store visit', p.storeVisitRate, 'storeVisitRate', b)}
+              ${p.clicks!=null?devBar('Click', p.clickRate, 'clickRate', b):''}
+              ${p.orders!=null?devBar('Order', p.orderConversionRate, 'orderConversionRate', b):''}
+              ${p.gmv!=null?devBar('ARPU', p.arpu, 'arpu', b):''}
+            </div>
+            <div class="dev-axis"><span>−50%</span><span>baseline</span><span>+50%</span></div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (p.gmv != null || p.viewerFemale != null){
+      html += `<div class="sec-h">Commercial performance</div><div class="grid2">`;
+      if (p.gmv != null){
+        html += `<div class="panel">
+          <div class="p-head"><span class="p-title">Revenue Metrics</span></div>
+          <div class="p-hint">GMV and orders are shown for reference and not compared to your baseline.</div>
+          <div class="stats">
+            <div class="stat"><div class="k">GMV</div><div class="v">¥${p.gmv.toLocaleString()} <span class="tag info">shown</span></div></div>
+            ${p.orders!=null?`<div class="stat"><div class="k">Orders</div><div class="v">${p.orders} <span class="tag info">shown</span></div></div>`:''}
+            ${p.aov!=null?`<div class="stat"><div class="k">Avg order value</div><div class="v">${cny(p.aov)}</div></div>`:''}
+            <div class="stat"><div class="k">ARPU</div><div class="v">${cny(p.arpu)} ${tag(d.readings.arpu)}</div>${b.arpu.p50!=null?`<div class="sub">baseline ~${cny(b.arpu.p50)}</div>`:''}</div>
+            ${p.clicks!=null?`<div class="stat"><div class="k">GMV / click</div><div class="v">${cny(p.gmvPerClick)} ${tag(d.readings.gmvPerClick)}</div>${b.gmvPerClick.p50!=null?`<div class="sub">baseline ~${cny(b.gmvPerClick.p50)}</div>`:''}</div>`:''}
+            ${p.unitPrice!=null?`<div class="stat"><div class="k">Unit price</div><div class="v">¥${p.unitPrice}</div></div>`:''}
+          </div>
+        </div>`;
+      }
+      if (p.viewerFemale != null && p.buyerFemale != null){
+        const propUp = p.buyerFemale > p.viewerFemale;
+        html += `<div class="panel">
+          <div class="p-head"><span class="p-title">Audience vs Buyers</span><span class="p-note">by gender</span></div>
+          <div class="p-hint">Who watched against who bought.</div>
+          <div class="aud-row">
+            <div class="aud-lbl"><span class="who">Women</span><span class="prop" style="color:${propUp?'var(--above)':'var(--below)'}">buy ${propUp?'above':'below'} their share ${propUp?'▲':'▼'}</span></div>
+            <div class="aud-bars">
+              <div class="aud-bar" style="width:${p.viewerFemale}%;background:var(--base)">viewers ${p.viewerFemale}%</div>
+              <div class="aud-bar" style="width:${p.buyerFemale}%;background:var(--self)">buyers ${p.buyerFemale}%</div>
+            </div>
+          </div>
+          <div class="aud-key">Purchase propensity for women: ${p.purchasePropensityFemale.toFixed(2)}× their audience share.</div>
+        </div>`;
+      }
+      html += `</div>`;
+    }
+
+    if (p.completion3s != null || p.avgWatchTime != null){
+      html += `<div class="sec-h">Content signals</div><div class="grid2">`;
+      if (p.completion3s != null){
+        const baseC3 = b.completion3sFrac.p50;
+        const pieceY = 132 - (p.completion3sFrac * 120);
+        const baseY = baseC3 != null ? 132 - (baseC3 * 120) : null;
+        html += `<div class="panel">
+          <div class="p-head"><span class="p-title">Opening Retention</span></div>
+          <div class="p-hint">3-second completion against your baseline.</div>
+          <div class="legend"><span class="s"><i></i>This piece</span><span class="b"><i></i>Your baseline</span></div>
+          <svg viewBox="0 0 480 170" width="100%" height="170">
+            <line x1="38" y1="10" x2="38" y2="132" stroke="#e7e9ee"/>
+            <line x1="38" y1="132" x2="466" y2="132" stroke="#e7e9ee"/>
+            <text x="32" y="14" font-size="9" fill="#9aa0a8" text-anchor="end">100%</text>
+            <text x="32" y="75" font-size="9" fill="#9aa0a8" text-anchor="end">50%</text>
+            <text x="32" y="134" font-size="9" fill="#9aa0a8" text-anchor="end">0</text>
+            <text x="38" y="148" font-size="9" fill="#9aa0a8" text-anchor="middle">0s</text>
+            <text x="180" y="148" font-size="9" fill="#9aa0a8" text-anchor="middle">3s</text>
+            ${baseY!=null?`<polyline points="38,12 180,${baseY}" fill="none" stroke="#c4cad4" stroke-width="2.5" stroke-dasharray="5 3"/><circle cx="180" cy="${baseY}" r="3.5" fill="#c4cad4"/>`:''}
+            <polyline points="38,12 180,${pieceY}" fill="none" stroke="#3d5afe" stroke-width="3"/>
+            <circle cx="180" cy="${pieceY}" r="4" fill="#3d5afe"/>
+            <text x="190" y="${pieceY+4}" font-size="10" fill="#3d5afe" font-weight="700">${p.completion3s}%</text>
+            ${baseC3!=null?`<text x="190" y="${baseY-6}" font-size="9" fill="#9aa0a8">baseline ${(baseC3*100).toFixed(0)}%</text>`:''}
+          </svg>
+        </div>`;
+      }
+      html += `<div class="panel">
+        <div class="p-head"><span class="p-title">Engagement</span><span class="p-note">vs your baseline</span></div>
+        <div class="p-hint">Each metric compared to this creator's own history.</div>
+        <div class="stats" style="grid-template-columns:repeat(2,1fr);">
+          ${p.avgWatchTime!=null?`<div class="stat"><div class="k">Avg watch time</div><div class="v">${p.avgWatchTime}s</div></div>`:''}
+          ${p.completionRate!=null?`<div class="stat"><div class="k">Completion rate</div><div class="v">${p.completionRate}% ${tag(d.readings.completionRate)}</div></div>`:''}
+          ${p.saves!=null?`<div class="stat"><div class="k">Save rate</div><div class="v">${pct(p.saveRate)}</div></div>`:''}
+          ${p.comments!=null?`<div class="stat"><div class="k">Comments</div><div class="v">${p.comments}</div></div>`:''}
+        </div>
+      </div>`;
+      html += `</div>`;
+    }
+
+    const prev = CCR.getPreviousPiece(p);
+    if (prev){
+      const prevD = CCR.diagnose(prev.id);
+      html += `<div class="sec-h">Compared to your last piece for this product</div><div class="panel full">
+        <div class="p-hint">Simplified comparison against <b>${prev.campaign}</b> (published ${fmtDate(prev.publishedAt)}). This does not track which action-list steps you actually applied between the two, which the full PRD design requires for a strict validation verdict.</div>
+      `;
+      const rows = [];
+      if (p.orderConversionRate != null && prevD.piece.orderConversionRate != null){
+        const improved = p.orderConversionRate > prevD.piece.orderConversionRate;
+        rows.push(`<div class="val-row"><span class="val-name">Order conversion</span><span class="val-old">${pct(prevD.piece.orderConversionRate)}</span><span class="val-arrow">→</span><span class="val-new ${improved?'above':'below'}">${pct(p.orderConversionRate)}</span><span class="tag ${improved?'above':'below'}">${improved?'▲ improved':'▼ declined'}</span></div>`);
+      }
+      if (p.completion3sFrac != null && prevD.piece.completion3sFrac != null){
+        const improved = p.completion3sFrac > prevD.piece.completion3sFrac;
+        rows.push(`<div class="val-row"><span class="val-name">3s completion</span><span class="val-old">${pct(prevD.piece.completion3sFrac)}</span><span class="val-arrow">→</span><span class="val-new ${improved?'above':'below'}">${pct(p.completion3sFrac)}</span><span class="tag ${improved?'above':'below'}">${improved?'▲ improved':'▼ declined'}</span></div>`);
+      }
+      html += rows.length ? rows.join('') : '<div style="font-size:12px;color:var(--faint);">Not enough overlapping fields between the two pieces to compare.</div>';
+      html += `</div>`;
+    }
+
+    html += `<div class="colorlegend">
+      <span><span class="sw" style="background:var(--self)"></span>This piece</span>
+      <span><span class="sw" style="background:var(--base)"></span>Baseline</span>
+      <span><span class="sw" style="background:var(--above)"></span>Above normal</span>
+      <span><span class="sw" style="background:var(--below)"></span>Below normal</span>
+      <span style="color:var(--faint)">· Computed live from ${d.sampleSize} comparable pieces stored in this browser.</span>
+    </div>`;
+
+    el.innerHTML = html;
+  }
+</script>
+</body>
+</html>

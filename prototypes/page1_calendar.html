@@ -260,6 +260,7 @@
 
 </div>
 
+<script src="js/engine.js"></script>
 <script>
   const mv=document.getElementById('monthView'), dv=document.getElementById('dayView');
   const pieceNav=document.getElementById('pieceNav');
@@ -371,8 +372,72 @@
   monthSel.onchange = () => { refreshMonthPieces(); renderPiece(); };
   yearSel.onchange = () => { refreshMonthPieces(); renderPiece(); };
 
+  // ------------------------------------------------------------------
+  // Pull in anything saved from the entry form (page3_entry.html) and
+  // fold it into both the month grid (if it falls in July 2026, the
+  // only month this static grid renders) and the `pieces` array the day
+  // view already walks through. New pieces route to page4_review.html,
+  // the live-computed diagnosis, rather than the static page2_detail.html.
+  // ------------------------------------------------------------------
+  function injectUserPieces(){
+    if (typeof CCR === 'undefined') return;
+    const userPieces = CCR.getUserPieces();
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const dowNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+    userPieces.forEach(up => {
+      const d = new Date(up.publishedAt);
+      const monthName = monthNames[d.getMonth()];
+      const year = String(d.getFullYear());
+      const dateNum = d.getDate();
+      const timeLabel = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+      const diag = CCR.diagnose(up.id);
+      const cls = diag.weakStage && diag.readings[diag.weakStage] === 'below' ? 'below'
+                : diag.sampleSize < 2 ? 'within'
+                : 'above';
+      const orderPct = diag.piece.orderConversionRate != null ? (diag.piece.orderConversionRate*100).toFixed(1) + '%' : '—';
+
+      // fold into the day-view pieces array regardless of month, so the
+      // prev/next walker sees it once that month is selected
+      pieces.push({
+        id: up.id, month: monthName, year: year,
+        date: `${dowNames[d.getDay()]}, ${monthName} ${dateNum}`,
+        shortDate: `${monthName.slice(0,3)} ${dateNum}, ${year}`,
+        prod: up.product, camp: up.campaign,
+        meta: `${up.format === 'unboxing' ? 'Unboxing' : 'Daily Share'} · published ${monthName.slice(0,3)} ${dateNum}, ${timeLabel} · added this session`,
+        cvr: `Order ${orderPct}`,
+        badge: cls === 'below' ? '▼ below baseline' : cls === 'above' ? '▲ above baseline' : 'Building baseline',
+        cls
+      });
+
+      // only render onto the visible grid if it's July 2026, the one
+      // month this static grid draws cells for
+      if (monthName === 'July' && year === '2026'){
+        const cells = document.querySelectorAll('#monthView .cell:not(.out)');
+        let targetCell = null;
+        cells.forEach(c => {
+          if (c.querySelector('.dnum').textContent === String(dateNum)) targetCell = c;
+        });
+        if (targetCell){
+          const a = document.createElement('a');
+          a.className = `evt ${cls}`;
+          a.href = `page4_review.html?piece=${up.id}`;
+          a.innerHTML = `<div class="prod">${up.product}</div><div class="camp">${up.campaign}</div><div class="time">${timeLabel}</div>`;
+          targetCell.appendChild(a);
+        }
+      }
+    });
+
+    if (userPieces.length){
+      refreshMonthPieces();
+      if (dv.classList.contains('show')) renderPiece();
+    }
+  }
+
   refreshMonthPieces();
   renderPiece();
+  injectUserPieces();
 </script>
 </body>
 </html>
