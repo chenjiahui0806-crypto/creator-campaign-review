@@ -23,8 +23,11 @@ Nothing to install, no sign-up. Anything you type in stays in your own browser �
 
 ## For the curious
 
+There's also an in-product **[How it works](https://chenjiahui0806-crypto.github.io/creator-campaign-review/prototypes/page5_how_it_works.html)** page that shows the seven diagnosis rules and real numbers from whatever's in your browser right now.
+
 If you want to see how it's built under the hood:
 
+- **[TECHNICAL.md](./TECHNICAL.md)** — the detailed technical writeup: architecture, design decisions, repo structure
 - `/prototypes` — the pages you just clicked through
 - `/prd` — the full written product plan behind it
 - `/sql`, `/skills`, `/verification` — the technical logic behind how it makes its diagnoses
