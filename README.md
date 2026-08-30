@@ -21,7 +21,7 @@ Nothing to install, no sign-up. Anything you type in stays in your own browser â
 - If a post is brand new with nothing to compare it to, the tool says so instead of guessing.
 - This is a working prototype, not a finished app. Anything you enter is saved only in your own browser, not on a server â€” it won't be there if you switch devices or clear your browser data.
 
-## For the curious
+## Technical details
 
 There's also an in-product **[How it works](https://chenjiahui0806-crypto.github.io/creator-campaign-review/prototypes/page5_how_it_works.html)** page that shows the seven diagnosis rules and real numbers from whatever's in your browser right now.
 
