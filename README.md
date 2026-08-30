@@ -1,61 +1,34 @@
 # Creator Campaign Review
 
-A post-publish analytics tool that tells a sponsored-content creator which stage of their conversion funnel underperformed, why it likely happened, and what to change on the next piece.
+A simple tool for creators who post sponsored content. It looks at how a video did, tells you in plain words what most likely went wrong (or right), and gives you one clear thing to try on your next post.
 
-This project originated from firsthand experience managing social media accounts and running brand deals. It exists to close a gap creators face today: there is no systematic way to analyze sponsored content performance after publishing, attribute the likely cause, and turn that into a concrete action for the next piece.
+## Try it
 
-**Live demo:** https://chenjiahui0806-crypto.github.io/creator-campaign-review/prototypes/
+👉 **[Open the live demo](https://chenjiahui0806-crypto.github.io/creator-campaign-review/prototypes/)**
 
-## What this is
+Nothing to install, no sign-up. Anything you type in stays in your own browser — nobody else can see it.
 
-The product is two pages. The calendar browses published pieces on their publish date, colored by how each one read against the creator's own baseline. Tapping a piece opens its review: a diagnosis of which funnel stage underperformed, the likely content-side or commercial-side reasons with evidence, an action checklist, and a post-publish validation panel that checks whether the advice actually worked once the next piece is entered.
+## What it does
 
-Three design constraints run through the whole product:
+- **See all your posts on a calendar.** Every video goes on the day you posted it. The color tells you at a glance how it did — green means better than your usual, red means worse, gray means normal.
+- **Click any post to see why.** It explains in plain words where things went wrong: did people stop watching in the first few seconds? Did they watch but not tap through to the product? Did they click but not buy?
+- **Add your own posts.** Type a post's numbers in by hand, or upload a spreadsheet to add several at once.
+- **Watch it get smarter over time.** The more posts you add, the more sure the tool becomes about what's normal for you — and it says so honestly when it doesn't have enough data yet to be confident.
 
-- Absolute values are never compared across pieces at different stages, because they scale with reach and follower growth rather than with the piece itself.
-- No industry-average benchmark is used for cross-account comparison. Every reading compares a creator only against their own history.
-- A first piece with no history is still analyzable, and confidence is expressed in words (high / medium / low / none) rather than hidden behind a chart the user has to interpret.
+## A few things worth knowing
 
-## Repository structure
+- It only ever compares a post to **your own** past posts — never to other creators or industry averages, since everyone's audience and prices are different.
+- If a post is brand new with nothing to compare it to, the tool says so instead of guessing.
+- This is a working prototype, not a finished app. Anything you enter is saved only in your own browser, not on a server — it won't be there if you switch devices or clear your browser data.
 
-```
-/prd            Product requirements document (13 sections)
-/prototypes     Interactive HTML prototypes — calendar, detail, and entry pages, wired to navigate between each other
-/skills         AI Skill and Framework architecture for the analysis engine
-/sql            The engine's queries: schema, baseline calculation, deviation reading, R1-R7 rule evaluation, data validation
-/verification   A script that generates synthetic data and checks the R1-R7 rules actually fire the way the spec describes
-```
+## For the curious
 
-### /prd
-`PRD.md` covers overview, goals and non-goals, user analysis, benchmarking, funnel definitions, metrics, attribution, functional modules M1–M9, dashboard specification, constraints, MVP success criteria, data model, platform metrics, and a walkthrough.
+If you want to see how it's built under the hood:
 
-Key decisions: reading window at day 2 for rate metrics, 7 fixed attribution rules (R1–R7) so every conclusion traces to a rule with a measurable hit rate, confidence tiers (High ≥12 comparable pieces, Medium 8–11, Low 2–7, None <2), gross commercial figures at P0 with refund rate deferred to P1, and single-dimension audience analysis with purchase propensity expressed in words.
+- `/prototypes` — the pages you just clicked through
+- `/prd` — the full written product plan behind it
+- `/sql`, `/skills`, `/verification` — the technical logic behind how it makes its diagnoses
 
-### /prototypes
-- `index.html` — redirects straight into the calendar, the live-demo entry point.
-- `page1_calendar.html` — month and day calendar views, color-coded by order-conversion reading against baseline. The day view's prev/next arrows step through that month's pieces; a "New content entry" link opens the entry form.
-- `page2_detail.html` — diagnosis at the top, action list, conversion funnel with per-stage definitions, stage deviation chart, commercial metrics, audience-vs-buyers comparison, opening retention curve, engagement stats, and post-publish validation verdict.
-- `page3_entry.html` — the M2 content-entry form: required identifying fields up top, optional funnel/content/commercial/audience fields grouped below. A static mock — the "Save piece" button confirms visually but doesn't persist anywhere, since there's no backend behind this prototype yet.
+---
 
-Clicking a piece on the calendar navigates to its detail page. The detail page's content is currently a fixed example dataset; the navigation already carries a `piece` identifier through the URL, so wiring in a real per-piece data source is a drop-in change rather than a redesign.
-
-### /sql
-Six queries implementing the engine described in `/skills`: schema, comparable-set selection, baseline percentile calculation, stage deviation reading, R1-R7 rule evaluation, and pre-save data validation. See `sql/README.md` for how they chain together and which PRD section each one implements.
-
-### /verification
-A script that generates synthetic baseline history and seven rule-testing pieces, then checks the R1-R7 attribution logic fires correctly against each one — 7/7 currently pass. See `verification/README.md` for details.
-
-### /skills
-`skill-framework.md` documents the analysis engine in three parts: the 10-step platform flow, the three Skill specifications (Data Validation, Locate & Attribute, Recommend & Validate), and the implementation spec (data model, funnel definitions, metric formulas, the R1–R7 rule table, confidence tiers).
-
-The design principle: SQL and code handle every deterministic calculation. Skills only run at the three points that require judgment — validating whether data is trustworthy, attributing a weak stage to a likely cause, and generating and later validating a recommendation. Skill output is tightly bounded so it never decides for the user, only analyzes and suggests.
-
-## Status
-
-- PRD: final draft, 13 sections complete.
-- Prototypes: three pages built and linked (calendar, detail, entry); content is a static example dataset pending a real backend.
-- Skill/Framework architecture: documented.
-- SQL: schema and core queries written directly off the PRD's field definitions, not yet run against a live database.
-- Verification: R1-R7 attribution logic tested against synthetic data, 7/7 rules firing as specified.
-
-See `CHANGELOG.md` for version history and `Issues` for open questions and planned work.
+Built as an independent project, drawing on firsthand experience running sponsored content on TikTok.
