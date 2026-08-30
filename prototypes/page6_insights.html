@@ -49,6 +49,14 @@
   .filter-chip{font-size:12px;font-weight:700;padding:7px 14px;border-radius:20px;border:1px solid var(--line);color:var(--sub);cursor:pointer;background:#fff;}
   .filter-chip.active{background:var(--ink);color:#fff;border-color:var(--ink);}
 
+  .sb-platform-label{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:24px;margin-bottom:8px;}
+  .sb-platform{display:flex;flex-direction:column;gap:4px;}
+  .sb-platform button{display:flex;align-items:center;justify-content:space-between;font:inherit;font-size:13px;font-weight:700;color:var(--sub);background:none;border:1px solid transparent;padding:9px 12px;border-radius:10px;cursor:pointer;text-align:left;width:100%;}
+  .sb-platform button.active{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-platform button.active .sb-plat-dot{background:var(--self);}
+  .sb-plat-dot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex-shrink:0;}
+  .sb-platform button span.pname{display:flex;align-items:center;gap:8px;}
+
   .ins-list{margin-top:20px;display:flex;flex-direction:column;}
   .ins-row{display:flex;align-items:flex-start;gap:14px;padding:16px 4px;border-top:1px solid var(--hair);}
   .ins-row:first-child{border-top:none;}
@@ -79,6 +87,8 @@
         <div class="sb-name">Creator Account</div>
         <div class="sb-role">TikTok · Sponsored content</div>
       </div>
+      <div class="sb-platform-label">Platform</div>
+      <div class="sb-platform" id="platformSwitcher"></div>
       <a class="sb-cta" href="page3_entry.html"><span class="plus">+</span>New Content</a>
       <nav class="sb-nav">
         <a href="page0_dashboard.html"><span class="ic">▦</span>Dashboard</a>
@@ -104,7 +114,21 @@
 
 <script src="js/engine.js"></script>
 <script>
-  const all = CCR.getAllPieces().slice().sort((a,b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+  // ---- platform switcher (sidebar) ----
+  (function(){
+    const el = document.getElementById('platformSwitcher');
+    const filter = CCR.getPlatformFilter();
+    const options = ['all', ...CCR.getAvailablePlatforms()];
+    el.innerHTML = options.map(p => {
+      const label = p === 'all' ? 'All platforms' : p;
+      return `<button class="${p === filter ? 'active' : ''}" data-platform="${p}"><span class="pname"><span class="sb-plat-dot"></span>${label}</span></button>`;
+    }).join('');
+    el.querySelectorAll('button').forEach(btn => {
+      btn.onclick = () => { CCR.setPlatformFilter(btn.dataset.platform); location.reload(); };
+    });
+  })();
+
+  const all = CCR.getFilteredPieces().slice().sort((a,b) => new Date(b.publishedAt) - new Date(a.publishedAt));
   const withRules = all.map(p => ({ p, d: CCR.diagnose(p.id) })).filter(x => x.d.fired.length);
 
   const sides = ['all', 'content', 'commercial'];

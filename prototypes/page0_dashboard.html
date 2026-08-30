@@ -30,6 +30,14 @@
   .sb-cta{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;padding:13px;border-radius:14px;background:var(--accent);color:#fff;font-size:14px;font-weight:800;text-decoration:none;box-shadow:0 4px 10px -3px rgba(232,88,58,.45);}
   .sb-cta:hover{filter:brightness(1.05);}
   .sb-cta .plus{font-size:17px;line-height:1;}
+
+  .sb-platform-label{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:24px;margin-bottom:8px;}
+  .sb-platform{display:flex;flex-direction:column;gap:4px;}
+  .sb-platform button{display:flex;align-items:center;justify-content:space-between;font:inherit;font-size:13px;font-weight:700;color:var(--sub);background:none;border:1px solid transparent;padding:9px 12px;border-radius:10px;cursor:pointer;text-align:left;}
+  .sb-platform button.active{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-platform button.active .sb-plat-dot{background:var(--accent);}
+  .sb-plat-dot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex-shrink:0;}
+  .sb-platform button span.pname{display:flex;align-items:center;gap:8px;}
   .sb-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#f4a06f);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;}
   .sb-name{font-size:14px;font-weight:800;margin-top:10px;}
   .sb-role{font-size:11px;color:var(--sub);margin-top:1px;}
@@ -59,9 +67,12 @@
   .panel-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;}
   .panel-title{font-size:19px;}
   .panel-note{font-size:11px;color:var(--faint);}
-  .range-sel{font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:20px;padding:6px 14px;color:var(--sub);background:#fff;}
+  .range-sel{font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:20px;padding:6px 14px;color:var(--sub);background:#fff;text-decoration:none;display:inline-block;}
+  .range-sel:hover{border-color:var(--self);color:var(--self);}
+  .range-sel:hover{border-color:var(--self);color:var(--self);}
 
   .perf-list{display:flex;flex-direction:column;}
+  .panel-scroll{max-height:230px;overflow-y:auto;}
   .perf-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--hair);}
   .perf-row:first-child{border-top:none;}
   .perf-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;}
@@ -82,19 +93,6 @@
   .ins-meta{font-size:11px;color:var(--faint);margin-top:2px;}
   .ins-link{margin-left:auto;font-size:11px;font-weight:700;color:var(--accent);text-decoration:none;flex-shrink:0;white-space:nowrap;}
 
-  .channels{margin-top:30px;background:var(--teal-soft);border-radius:18px;padding:22px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
-  .ch-intro{flex-shrink:0;max-width:150px;}
-  .ch-intro .t{font-size:18px;}
-  .ch-intro .s{font-size:11px;color:var(--sub);margin-top:6px;line-height:1.5;}
-  .ch-card{background:#fff;border-radius:14px;padding:14px 16px;min-width:110px;}
-  .ch-card .ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800;margin-bottom:8px;}
-  .ch-card .name{font-size:12.5px;font-weight:800;}
-  .ch-card .handle{font-size:10px;color:var(--faint);margin-bottom:8px;}
-  .ch-card .pct{font-size:15px;font-weight:800;}
-  .ch-card .pct.up{color:var(--above);} .ch-card .pct.down{color:var(--below);}
-  .full-stats{margin-left:auto;background:var(--teal);color:#fff;border-radius:14px;padding:16px 20px;text-decoration:none;display:flex;flex-direction:column;gap:10px;}
-  .full-stats .t{font-size:14px;font-weight:800;line-height:1.2;}
-  .full-stats .arrow{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;}
 
   .empty-note{font-size:12px;color:var(--faint);padding:16px 0;}
 </style>
@@ -110,6 +108,8 @@
         <div class="sb-name">Creator Account</div>
         <div class="sb-role">TikTok · Sponsored content</div>
       </div>
+      <div class="sb-platform-label">Platform</div>
+      <div class="sb-platform" id="platformSwitcher"></div>
       <a class="sb-cta" href="page3_entry.html"><span class="plus">+</span>New Content</a>
       <nav class="sb-nav">
         <a class="active" href="page0_dashboard.html"><span class="left"><span class="ic">▦</span>Dashboard</span></a>
@@ -140,25 +140,23 @@
             <div class="panel-title display">Order conversion</div>
             <div class="panel-note">Each piece against the baseline current at the time</div>
           </div>
-          <div class="range-sel">All pieces</div>
+          <a class="range-sel" href="page1_calendar.html">All pieces</a>
         </div>
         <svg id="trendChart" viewBox="0 0 1120 220" width="100%" height="220"></svg>
       </div>
 
-      <div class="grid2">
+      <div class="grid2" style="margin-top:24px;">
         <div>
           <div class="panel-head"><div class="panel-title display">Strongest pieces</div></div>
-          <div class="perf-list" id="perfList"></div>
+          <div class="perf-list panel-scroll" id="perfList"></div>
           <a class="view-more" href="page1_calendar.html">View all →</a>
         </div>
         <div class="insights" id="recent-insights" style="margin-top:0;">
           <div class="panel-head"><div class="panel-title display">Recent insights</div></div>
-          <div id="insightsList"></div>
+          <div class="panel-scroll" id="insightsList"></div>
           <a class="view-more" href="page6_insights.html">View all →</a>
         </div>
       </div>
-
-      <div class="channels" id="channelsRow"></div>
 
     </main>
   </div>
@@ -166,26 +164,44 @@
 
 <script src="js/engine.js"></script>
 <script>
-  const PLATFORM_COLORS = { TikTok:'#241d18', RedNote:'#e8583a', Other:'#4f9d92' };
-  const PLATFORM_INITIAL = { TikTok:'TT', RedNote:'RN', Other:'•' };
-
   function fmtCompact(n){
     if (n >= 1000000) return (n/1000000).toFixed(1).replace(/\.0$/,'') + 'm';
     if (n >= 1000) return (n/1000).toFixed(1).replace(/\.0$/,'') + 'k';
     return String(n);
   }
 
-  const all = CCR.getAllPieces().map(CCR.derive).filter(p => p.publishedAt);
+  const all = CCR.getFilteredPieces().map(CCR.derive).filter(p => p.publishedAt);
   all.sort((a,b) => new Date(a.publishedAt) - new Date(b.publishedAt));
+  const platformFilter = CCR.getPlatformFilter();
+
+  // ---- platform switcher (sidebar) ----
+  (function(){
+    const el = document.getElementById('platformSwitcher');
+    const options = ['all', ...CCR.getAvailablePlatforms()];
+    el.innerHTML = options.map(p => {
+      const label = p === 'all' ? 'All platforms' : p;
+      return `<button class="${p === platformFilter ? 'active' : ''}" data-platform="${p}"><span class="pname"><span class="sb-plat-dot"></span>${label}</span></button>`;
+    }).join('');
+    el.querySelectorAll('button').forEach(btn => {
+      btn.onclick = () => { CCR.setPlatformFilter(btn.dataset.platform); location.reload(); };
+    });
+  })();
 
   document.getElementById('statPieces').textContent = all.length;
   document.getElementById('statViews').textContent = fmtCompact(all.reduce((s,p) => s + (p.views||0), 0));
   document.getElementById('statGmv').textContent = '$' + fmtCompact(Math.round(all.reduce((s,p) => s + (p.gmv||0), 0)));
 
-  // ---- trend chart: order conversion rate per piece over time ----
+  // ---- trend chart: order conversion rate per piece over time. Only
+  // meaningful for a single platform, since each platform holds its own
+  // baseline — under "All", rates from different platforms would be
+  // plotted on the same line as if they were comparable, which they aren't. ----
   (function(){
-    const withRate = all.filter(p => p.orderConversionRate != null);
     const svg = document.getElementById('trendChart');
+    if (platformFilter === 'all'){
+      svg.outerHTML = '<div class="empty-note">Rates aren\'t comparable across platforms — pick one in the sidebar to see its trend.</div>';
+      return;
+    }
+    const withRate = all.filter(p => p.orderConversionRate != null);
     if (withRate.length < 2){
       svg.outerHTML = '<div class="empty-note">Need at least 2 pieces with funnel data to draw a trend.</div>';
       return;
@@ -217,15 +233,20 @@
     svg.innerHTML = svgHtml;
   })();
 
-  // ---- rule hit rate (approx, from verification-style pass rate if available; else static reference) ----
   // ---- rule hit rate callout removed in favor of a plain-language link to
   // page5_how_it_works.html, which shows the real numbers for anyone curious ----
 
-  // ---- strongest pieces (top 3 by order conversion rate) ----
+  // ---- strongest pieces (top 3 by order conversion rate). Also only
+  // meaningful within a single platform — ranking TikTok and RedNote
+  // pieces on the same list would imply their rates are on the same scale. ----
   (function(){
+    const list = document.getElementById('perfList');
+    if (platformFilter === 'all'){
+      list.innerHTML = '<div class="empty-note">Rankings aren\'t comparable across platforms — pick one in the sidebar.</div>';
+      return;
+    }
     const ranked = all.filter(p => p.orderConversionRate != null)
       .slice().sort((a,b) => b.orderConversionRate - a.orderConversionRate).slice(0,3);
-    const list = document.getElementById('perfList');
     if (!ranked.length){ list.innerHTML = '<div class="empty-note">No pieces with funnel data yet.</div>'; return; }
     list.innerHTML = ranked.map((p,i) => {
       const diag = CCR.diagnose(p.id);
@@ -240,9 +261,12 @@
     }).join('');
   })();
 
-  // ---- recent insights: pieces with fired rules, most recent first ----
+  // ---- recent insights: pieces with fired rules, most recent first. This
+  // stays available under "All" too — it's a log of individual findings,
+  // each already read against its own piece's baseline, not a ranked
+  // comparison, so mixing platforms here doesn't misrepresent anything. ----
   (function(){
-    const withRules = all.slice().reverse().map(p => ({ p, d: CCR.diagnose(p.id) })).filter(x => x.d.fired.length).slice(0,4);
+    const withRules = all.slice().reverse().map(p => ({ p, d: CCR.diagnose(p.id) })).filter(x => x.d.fired.length).slice(0,8);
     const list = document.getElementById('insightsList');
     if (!withRules.length){ list.innerHTML = '<div class="empty-note">No flagged pieces yet — insights appear here once a rule fires.</div>'; return; }
     list.innerHTML = withRules.map(({p,d}) => {
@@ -251,34 +275,11 @@
         <span class="ins-tag ${f.side}">${f.rule}</span>
         <div style="flex:1;">
           <div class="ins-text"><b>${p.campaign}</b> — ${f.text}</div>
-          <div class="ins-meta">${p.product} · ${new Date(p.publishedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+          <div class="ins-meta">${p.product} · ${p.platform} · ${new Date(p.publishedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
         </div>
         <a class="ins-link" href="page4_review.html?piece=${p.id}">View →</a>
       </div>`;
     }).join('');
-  })();
-
-  // ---- platform breakdown ----
-  (function(){
-    const platforms = [...new Set(all.map(p => p.platform))];
-    const row = document.getElementById('channelsRow');
-    let html = `<div class="ch-intro"><div class="t display">Platforms</div><div class="s">Piece count and average order-conversion deviation.</div></div>`;
-    platforms.forEach(plat => {
-      const pieces = all.filter(p => p.platform === plat && p.orderConversionRate != null);
-      if (!pieces.length) return;
-      const avg = pieces.reduce((s,p)=>s+p.orderConversionRate,0)/pieces.length;
-      const overall = all.filter(p=>p.orderConversionRate!=null).reduce((s,p)=>s+p.orderConversionRate,0) / all.filter(p=>p.orderConversionRate!=null).length;
-      const dp = overall ? ((avg-overall)/overall*100) : 0;
-      const up = dp >= 0;
-      html += `<div class="ch-card">
-        <div class="ic" style="background:${PLATFORM_COLORS[plat]||'#8b8178'}">${PLATFORM_INITIAL[plat]||plat[0]}</div>
-        <div class="name">${plat}</div>
-        <div class="handle">${pieces.length} pieces</div>
-        <div class="pct ${up?'up':'down'}">${up?'+':''}${dp.toFixed(0)}%</div>
-      </div>`;
-    });
-    html += `<a class="full-stats" href="page1_calendar.html"><span class="t">Full<br>Calendar</span><span class="arrow">→</span></a>`;
-    row.innerHTML = html;
   })();
 </script>
 </body>

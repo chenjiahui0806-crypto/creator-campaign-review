@@ -130,6 +130,14 @@
   .legend span{display:flex;align-items:center;gap:6px;}
   .sw{width:11px;height:11px;border-radius:3px;}
   .hint{font-size:11px;color:var(--faint);margin-top:12px;}
+
+  .sb-platform-label{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:24px;margin-bottom:8px;}
+  .sb-platform{display:flex;flex-direction:column;gap:4px;}
+  .sb-platform button{display:flex;align-items:center;justify-content:space-between;font:inherit;font-size:13px;font-weight:700;color:var(--sub);background:none;border:1px solid transparent;padding:9px 12px;border-radius:10px;cursor:pointer;text-align:left;width:100%;}
+  .sb-platform button.active{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-platform button.active .sb-plat-dot{background:var(--self);}
+  .sb-plat-dot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex-shrink:0;}
+  .sb-platform button span.pname{display:flex;align-items:center;gap:8px;}
 </style>
 </head>
 <body>
@@ -142,6 +150,8 @@
         <div class="sb-name">Creator Account</div>
         <div class="sb-role">TikTok · Sponsored content</div>
       </div>
+      <div class="sb-platform-label">Platform</div>
+      <div class="sb-platform" id="platformSwitcher"></div>
       <a class="sb-cta" href="page3_entry.html"><span class="plus">+</span>New Content</a>
       <nav class="sb-nav">
         <a href="page0_dashboard.html"><span class="ic">▦</span>Dashboard</a>
@@ -327,6 +337,31 @@
 
 <script src="js/engine.js"></script>
 <script>
+  // ---- platform switcher (sidebar) — filters both the month grid and the
+  // day-view piece list to the selected platform, persisted site-wide ----
+  (function(){
+    const el = document.getElementById('platformSwitcher');
+    const filter = CCR.getPlatformFilter();
+    const options = ['all', ...CCR.getAvailablePlatforms()];
+    el.innerHTML = options.map(p => {
+      const label = p === 'all' ? 'All platforms' : p;
+      return `<button class="${p === filter ? 'active' : ''}" data-platform="${p}"><span class="pname"><span class="sb-plat-dot"></span>${label}</span></button>`;
+    }).join('');
+    el.querySelectorAll('button').forEach(btn => {
+      btn.onclick = () => { CCR.setPlatformFilter(btn.dataset.platform); location.reload(); };
+    });
+  })();
+
+  // hide any static month-grid event whose piece doesn't match the current filter
+  (function(){
+    const filter = CCR.getPlatformFilter();
+    if (filter === 'all') return;
+    document.querySelectorAll('#monthView .evt[data-piece]').forEach(evt => {
+      const piece = CCR.getPieceById(evt.dataset.piece);
+      if (!piece || piece.platform !== filter) evt.style.display = 'none';
+    });
+  })();
+
   const mv=document.getElementById('monthView'), dv=document.getElementById('dayView');
   const pieceNav=document.getElementById('pieceNav');
 
@@ -411,6 +446,17 @@
       meta:'Unboxing · TikTok · organic · published Jul 29, 10:10 PM',
       cvr:'Order 9.3%', badge:'▼ below baseline', cls:'below' }
   ];
+
+  // apply the site-wide platform filter to the day-view piece list too
+  (function(){
+    const filter = CCR.getPlatformFilter();
+    if (filter === 'all') return;
+    for (let i = pieces.length - 1; i >= 0; i--){
+      const full = CCR.getPieceById(pieces[i].id);
+      if (!full || full.platform !== filter) pieces.splice(i, 1);
+    }
+  })();
+
   let curIdx = 0;
   let monthPieces = [];
 
@@ -478,7 +524,8 @@
   // ------------------------------------------------------------------
   function injectUserPieces(){
     if (typeof CCR === 'undefined') return;
-    const userPieces = CCR.getUserPieces();
+    const platformFilter = CCR.getPlatformFilter();
+    const userPieces = CCR.getUserPieces().filter(up => platformFilter === 'all' || up.platform === platformFilter);
     const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const dowNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 

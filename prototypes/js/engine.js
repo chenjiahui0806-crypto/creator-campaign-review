@@ -8,6 +8,7 @@
 const CCR = (() => {
   const STORAGE_KEY = 'ccr_user_pieces_v1';
   const HIDE_SEED_KEY = 'ccr_hide_seed_v1';
+  const PLATFORM_FILTER_KEY = 'ccr_platform_filter_v1';
 
   // ---------------------------------------------------------------------
   // Seed history: the 7 pieces already shown on the July 2026 calendar
@@ -141,6 +142,31 @@ const CCR = (() => {
   function setSeedHidden(hidden) {
     if (hidden) localStorage.setItem(HIDE_SEED_KEY, '1');
     else localStorage.removeItem(HIDE_SEED_KEY);
+  }
+
+  // ---------------------------------------------------------------------
+  // Site-wide platform filter — persists across pages via localStorage.
+  // 'all' means no filter (every platform shown); otherwise an exact
+  // platform name like 'TikTok' or 'RedNote'. This exists because rates
+  // and rankings should never mix platforms (each holds its own baseline),
+  // while pure sums (views, GMV) are fine to add across platforms.
+  // ---------------------------------------------------------------------
+  function getPlatformFilter() {
+    return localStorage.getItem(PLATFORM_FILTER_KEY) || 'all';
+  }
+
+  function setPlatformFilter(platform) {
+    localStorage.setItem(PLATFORM_FILTER_KEY, platform);
+  }
+
+  function getAvailablePlatforms() {
+    return [...new Set(getAllPieces().map(p => p.platform))].sort();
+  }
+
+  function getFilteredPieces() {
+    const filter = getPlatformFilter();
+    const all = getAllPieces();
+    return filter === 'all' ? all : all.filter(p => p.platform === filter);
   }
 
   function getPieceById(id) {
@@ -309,5 +335,6 @@ const CCR = (() => {
   }
 
   return { getAllPieces, getUserPieces, saveUserPiece, getPieceById, getPreviousPiece,
-    isSeedHidden, setSeedHidden, derive, computeBaseline, confidenceLabel, reading, diagnose };
+    isSeedHidden, setSeedHidden, getPlatformFilter, setPlatformFilter, getAvailablePlatforms,
+    getFilteredPieces, derive, computeBaseline, confidenceLabel, reading, diagnose };
 })();
