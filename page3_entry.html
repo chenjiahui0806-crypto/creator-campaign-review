@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Content Entry</title>
+<style>
+  :root{
+    --ink:#16181d; --sub:#6a7078; --faint:#9aa0a8; --line:#e7e9ee; --hair:#f1f3f6;
+    --bg:#eceef2; --card:#ffffff;
+    --above:#2f9e6f; --below:#d5544b; --within:#8a9099; --amber:#c98a2b;
+    --above-bg:#e6f4ec; --below-bg:#fbe9e7; --within-bg:#eef0f3;
+    --self:#3d5afe;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.4;}
+  .page{width:1360px;margin:0 auto;background:var(--card);min-height:860px;padding:26px 30px 60px;}
+
+  /* header, matches calendar + detail pages */
+  .top{padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .top-row{display:flex;justify-content:space-between;align-items:flex-end;}
+  .brand{font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.01em;}
+  .h1-line{display:flex;align-items:center;gap:14px;margin-top:4px;}
+  .h1{font-size:22px;font-weight:800;letter-spacing:-.01em;}
+  .h-sub{font-size:12px;color:var(--sub);margin-top:3px;}
+  .back{font-size:12px;font-weight:600;color:var(--sub);text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+  .back:hover{color:var(--self);}
+
+  .demo-note{margin-top:16px;padding:10px 14px;border:1px solid var(--line);border-radius:9px;background:#f7f8fa;font-size:11px;color:var(--sub);}
+  .demo-note b{color:var(--ink);}
+
+  /* layout: two columns, form left, summary rail right */
+  .layout{display:grid;grid-template-columns:1fr 300px;gap:28px;margin-top:22px;align-items:start;}
+
+  .section{border:1px solid var(--line);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+  .section-head{padding:14px 18px;background:#fafbfc;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;}
+  .section-head .st{display:flex;flex-direction:column;gap:2px;}
+  .section-head .name{font-size:14px;font-weight:800;}
+  .section-head .desc{font-size:11px;color:var(--sub);}
+  .req-flag{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--below-bg);color:var(--below);}
+  .opt-flag{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--within-bg);color:var(--within);}
+  .section-body{padding:16px 18px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-size:11px;font-weight:700;color:var(--sub);}
+  .field .hint{font-size:10px;color:var(--faint);margin-top:-2px;}
+  .field input, .field select{
+    font:inherit;font-size:13px;color:var(--ink);background:#fff;border:1px solid var(--line);
+    border-radius:8px;padding:9px 11px;width:100%;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--self);}
+  .field input::placeholder{color:var(--faint);}
+  .toggle-row{display:flex;gap:10px;}
+  .toggle-row label{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:700;
+    padding:9px 0;border:1px solid var(--line);border-radius:8px;cursor:pointer;color:var(--sub);
+  }
+  .toggle-row input{display:none;}
+  .toggle-row input:checked + span{color:var(--self);}
+  .toggle-row label:has(input:checked){border-color:var(--self);background:#eef1ff;}
+
+  .field-note{margin-top:10px;font-size:10px;color:var(--faint);}
+
+  /* summary rail */
+  .rail{position:sticky;top:20px;border:1px solid var(--line);border-radius:12px;padding:18px;background:#fafbfc;}
+  .rail h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--sub);margin-bottom:12px;}
+  .rail-row{display:flex;justify-content:space-between;font-size:12px;padding:7px 0;border-top:1px solid var(--hair);}
+  .rail-row:first-of-type{border-top:none;}
+  .rail-row .k{color:var(--sub);}
+  .rail-row .v{font-weight:700;color:var(--ink);}
+  .rail-foot{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:10px;color:var(--faint);line-height:1.5;}
+  .save-btn{width:100%;margin-top:18px;padding:12px;border:none;border-radius:9px;background:var(--self);color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+  .save-btn:hover{filter:brightness(1.05);}
+  .save-msg{display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--within-bg);color:var(--ink);font-size:11px;line-height:1.5;}
+  .save-msg.show{display:block;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top">
+    <div class="top-row">
+      <div>
+        <div class="brand">Campaign Content Review</div>
+        <div class="h1-line">
+          <div class="h1">New Content Entry</div>
+        </div>
+        <div class="h-sub">Enter one published piece. Only platform, product, publish time, format, and boost status are required — everything else can be filled in later.</div>
+      </div>
+      <a class="back" href="page1_calendar.html">‹ Back to calendar</a>
+    </div>
+  </div>
+
+  <div class="demo-note"><b>Working demo, browser-only.</b> "Save piece" writes to this browser's local storage and computes a real diagnosis using the R1-R7 rules — nothing is sent to a server, and nobody else can see it. Clear your browser data and it's gone. The grid on the calendar page only renders July 2026, so a piece published outside that month won't appear there visually, but it still counts toward the baseline.</div>
+
+  <div class="layout">
+    <div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="st">
+            <div class="name">Identifying info</div>
+            <div class="desc">A piece cannot be saved without these five fields.</div>
+          </div>
+          <span class="req-flag">Required</span>
+        </div>
+        <div class="section-body">
+          <div class="grid2">
+            <div class="field">
+              <label>Platform</label>
+              <select id="f-platform"><option>TikTok</option><option>RedNote</option><option>Other</option></select>
+            </div>
+            <div class="field">
+              <label>Product</label>
+              <select id="f-product"><option>Nut Brand</option><option>Drink Brand</option><option>Air Fryer Brand</option><option>Sheet-Mask Brand</option></select>
+            </div>
+            <div class="field">
+              <label>Campaign name</label>
+              <input type="text" id="f-campaign" placeholder="e.g. Late-Summer Snack List">
+            </div>
+            <div class="field">
+              <label>Published at</label>
+              <input type="datetime-local" id="f-published" value="2026-07-15T19:30">
+            </div>
+          </div>
+          <div class="field" style="margin-top:14px;">
+            <label>Content format</label>
+            <div class="toggle-row" style="max-width:300px;">
+              <label><input type="radio" name="fmt" value="unboxing" checked><span>Unboxing</span></label>
+              <label><input type="radio" name="fmt" value="daily_share"><span>Daily share</span></label>
+            </div>
+          </div>
+          <div class="field" style="margin-top:14px;">
+            <label>Boost status</label>
+            <div class="toggle-row" style="max-width:300px;">
+              <label><input type="radio" name="boost" value="organic" checked><span>Organic</span></label>
+              <label><input type="radio" name="boost" value="boosted"><span>Boosted</span></label>
+            </div>
+            <div class="hint">Boosted pieces never share a baseline with organic ones — impressions on a boosted piece weren't earned by the content.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="st">
+            <div class="name">Funnel</div>
+            <div class="desc">Impressions through orders. Missing a field only disables the rules that depend on it.</div>
+          </div>
+          <span class="opt-flag">Optional</span>
+        </div>
+        <div class="section-body">
+          <div class="grid3">
+            <div class="field"><label>Impressions</label><input type="number" id="f-impressions" placeholder="e.g. 15000"></div>
+            <div class="field"><label>Views</label><input type="number" id="f-views" placeholder="e.g. 9800"></div>
+            <div class="field"><label>Store visits</label><input type="number" id="f-storevisits" placeholder="e.g. 1400"></div>
+            <div class="field"><label>Clicks</label><input type="number" id="f-clicks" placeholder="e.g. 900"></div>
+            <div class="field"><label>Orders</label><input type="number" id="f-orders" placeholder="e.g. 270"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="st">
+            <div class="name">Content</div>
+            <div class="desc">Retention and engagement, read at day two.</div>
+          </div>
+          <span class="opt-flag">Optional</span>
+        </div>
+        <div class="section-body">
+          <div class="grid3">
+            <div class="field"><label>3s completion %</label><input type="number" id="f-completion3s" placeholder="e.g. 58"></div>
+            <div class="field"><label>Avg watch time (s)</label><input type="number" id="f-watchtime" placeholder="e.g. 11.2"></div>
+            <div class="field"><label>Completion rate %</label><input type="number" id="f-completionrate" placeholder="e.g. 33"></div>
+            <div class="field"><label>Saves</label><input type="number" id="f-saves" placeholder="e.g. 120"></div>
+            <div class="field"><label>Shares</label><input type="number" id="f-shares" placeholder="e.g. 45"></div>
+            <div class="field"><label>Comments</label><input type="number" id="f-comments" placeholder="e.g. 60"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="st">
+            <div class="name">Commercial</div>
+            <div class="desc">Gross figures only at P0 — refund data isn't available at the day-two reading age.</div>
+          </div>
+          <span class="opt-flag">Optional</span>
+        </div>
+        <div class="section-body">
+          <div class="grid3">
+            <div class="field"><label>GMV (¥)</label><input type="number" id="f-gmv" placeholder="e.g. 11500"></div>
+            <div class="field"><label>Unit price (¥)</label><input type="number" id="f-unitprice" placeholder="e.g. 68"></div>
+            <div class="field"><label>Discount %</label><input type="number" id="f-discount" placeholder="e.g. 10"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="st">
+            <div class="name">Audience</div>
+            <div class="desc">Gender split only, single dimension — crossed segments aren't available from platform dashboards.</div>
+          </div>
+          <span class="opt-flag">Optional</span>
+        </div>
+        <div class="section-body">
+          <div class="grid2">
+            <div class="field"><label>Viewers — % female</label><input type="number" id="f-viewerfemale" placeholder="e.g. 68"></div>
+            <div class="field"><label>Buyers — % female</label><input type="number" id="f-buyerfemale" placeholder="e.g. 85"></div>
+          </div>
+          <div class="field-note">Fewer than 50 orders on this piece will mark all audience readings low-confidence, per the PRD's benchmarking rules.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="rail">
+      <h3>Before you save</h3>
+      <div class="rail-row"><span class="k">Required fields</span><span class="v" id="rail-required">5 / 5</span></div>
+      <div class="rail-row"><span class="k">Optional fields filled</span><span class="v" id="rail-optional">0 / 17</span></div>
+      <div class="rail-row"><span class="k">Comparable baseline</span><span class="v" id="rail-baseline">7 pieces</span></div>
+      <div class="rail-row"><span class="k">Confidence if saved</span><span class="v" id="rail-confidence">Low</span></div>
+      <button class="save-btn" id="saveBtn">Save piece</button>
+      <div class="save-msg" id="saveMsg">Saved. Redirecting to its review…</div>
+      <div class="rail-foot">Reading age is measured from the publish time above. Retention and completion finalize within 24 hours; conversion rates stabilize enough to read around day two.</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/engine.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+
+  function updateRail(){
+    const required = [$('f-platform').value, $('f-product').value, $('f-published').value].every(v => v);
+    $('rail-required').textContent = required ? '5 / 5' : '4 / 5';
+
+    const optionalIds = ['f-impressions','f-views','f-storevisits','f-clicks','f-orders',
+      'f-completion3s','f-watchtime','f-completionrate','f-saves','f-shares','f-comments',
+      'f-gmv','f-unitprice','f-discount','f-viewerfemale','f-buyerfemale'];
+    const filled = optionalIds.filter(id => $(id).value !== '').length;
+    $('rail-optional').textContent = `${filled} / ${optionalIds.length}`;
+
+    const platform = $('f-platform').value;
+    const boost = document.querySelector('input[name="boost"]:checked').value;
+    const comparable = CCR.getAllPieces().filter(p => p.platform === platform && p.boost === boost);
+    $('rail-baseline').textContent = `${comparable.length} pieces`;
+    const conf = CCR.confidenceLabel(comparable.length);
+    $('rail-confidence').textContent = conf.charAt(0).toUpperCase() + conf.slice(1);
+  }
+  document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', updateRail));
+  updateRail();
+
+  function num(id){ const v = $(id).value; return v === '' ? null : Number(v); }
+
+  $('saveBtn').onclick = () => {
+    const platform = $('f-platform').value;
+    const product = $('f-product').value;
+    const campaign = $('f-campaign').value || 'Untitled piece';
+    const published = $('f-published').value;
+    if (!platform || !product || !published){
+      alert('Platform, product, and published date are required.');
+      return;
+    }
+    const format = document.querySelector('input[name="fmt"]:checked').value;
+    const boost = document.querySelector('input[name="boost"]:checked').value;
+
+    const id = 'user-' + Date.now();
+    const piece = {
+      id, platform, product, campaign,
+      publishedAt: published, format, boost,
+      impressions: num('f-impressions'), views: num('f-views'),
+      storeVisits: num('f-storevisits'), clicks: num('f-clicks'), orders: num('f-orders'),
+      completion3s: num('f-completion3s'), completionRate: num('f-completionrate'),
+      avgWatchTime: num('f-watchtime'), saves: num('f-saves'), shares: num('f-shares'), comments: num('f-comments'),
+      gmv: num('f-gmv'), unitPrice: num('f-unitprice'), discount: num('f-discount'),
+      viewerFemale: num('f-viewerfemale'), buyerFemale: num('f-buyerfemale'),
+    };
+    CCR.saveUserPiece(piece);
+    $('saveMsg').classList.add('show');
+    setTimeout(() => { location.href = 'page4_review.html?piece=' + id; }, 700);
+  };
+</script>
+</body>
+</html>
