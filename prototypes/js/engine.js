@@ -233,7 +233,7 @@ const CCR = (() => {
     if (weakStage === 'order' && gaps.order > 0) {
       if (readings.gmvPerClick === 'below') {
         fired.push({ rule: 'R5', stage: 'order', side: 'commercial',
-          text: 'The offer did not convert the viewers who reached it.', evidence: `GMV per click ¥${piece.gmvPerClick.toFixed(1)} is below your usual range.` });
+          text: 'The offer did not convert the viewers who reached it.', evidence: `GMV per click $${piece.gmvPerClick.toFixed(1)} is below your usual range.` });
       } else if (readings.click === 'within' && readings.gmvPerClick === 'within') {
         fired.push({ rule: 'R6', stage: 'order', side: 'content',
           text: 'The piece did not carry enough reason to buy.', evidence: 'Order conversion is below your usual range while click rate and GMV per click both read normal.' });
@@ -241,7 +241,7 @@ const CCR = (() => {
     }
     if (readings.order !== 'below' && readings.arpu === 'below') {
       fired.push({ rule: 'R7', stage: 'audience', side: 'content',
-        text: 'The piece reached the wrong audience.', evidence: `ARPU ¥${piece.arpu.toFixed(2)} is below your usual range even though order conversion reads normal.` });
+        text: 'The piece reached the wrong audience.', evidence: `ARPU $${piece.arpu.toFixed(2)} is below your usual range even though order conversion reads normal.` });
     }
 
     return { piece, baseline, sampleSize, confidence, weakStage, readings, fired };
