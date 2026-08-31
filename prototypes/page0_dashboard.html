@@ -47,15 +47,6 @@
   .sb-nav a .ic{width:16px;text-align:center;}
   .sb-nav a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
   .sb-nav a.active .ic{color:var(--accent);}
-  .sb-navgroup{position:relative;}
-  .sb-navmain{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
-  .sb-navmain.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
-  .sb-navmain.active .ic{color:var(--self, var(--accent));}
-  .sb-dropdown{display:none;flex-direction:column;padding-left:30px;gap:1px;margin-top:2px;margin-bottom:2px;}
-  .sb-navgroup:hover .sb-dropdown{display:flex;}
-  .sb-navgroup:hover .sb-navmain{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
-  .sb-navgroup:hover .sb-navmain .ic{color:var(--self, var(--accent));}
-  .sb-navmain:hover{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
   .sb-dropdown a{font-size:12px;font-weight:600;color:var(--faint);text-decoration:none;padding:7px 10px;border-radius:8px;}
   .sb-dropdown a:hover{background:var(--hair);color:var(--sub);}
 
@@ -108,6 +99,16 @@
 
 
   .empty-note{font-size:12px;color:var(--faint);padding:16px 0;}
+
+  .plat-dd{position:relative;}
+  .plat-dd-btn{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:9px 15px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;}
+  .plat-dd-btn:hover{border-color:var(--accent);}
+  .plat-dd-btn .car{font-size:10px;color:var(--faint);}
+  .plat-dd-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px;min-width:170px;box-shadow:0 10px 26px -10px rgba(0,0,0,.2);z-index:30;}
+  .plat-dd-menu.open{display:block;}
+  .plat-dd-menu a{display:block;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:9px 12px;border-radius:8px;}
+  .plat-dd-menu a:hover{background:var(--hair);}
+  .plat-dd-menu a.active{background:var(--accent-soft);color:var(--accent);}
 </style>
 </head>
 <body>
@@ -123,22 +124,8 @@
       </div>
       <a class="sb-cta" href="page3_entry.html"><span class="plus">+</span>New Content</a>
       <nav class="sb-nav">
-        <div class="sb-navgroup">
-          <a class="sb-navmain active" href="page0_dashboard.html" onclick="CCR.setPlatformFilter('all')"><span class="ic">▦</span>Dashboard</a>
-          <div class="sb-dropdown">
-            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('TikTok')">TikTok</a>
-            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('RedNote')">RedNote</a>
-            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
-          </div>
-        </div>
-        <div class="sb-navgroup">
-          <a class="sb-navmain" href="page1_calendar.html" onclick="CCR.setPlatformFilter('all')"><span class="ic">▤</span>Calendar</a>
-          <div class="sb-dropdown">
-            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('TikTok')">TikTok</a>
-            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('RedNote')">RedNote</a>
-            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
-          </div>
-        </div>
+        <a class="active" href="page0_dashboard.html"><span class="ic">▦</span>Dashboard</a>
+        <a href="page1_calendar.html"><span class="ic">▤</span>Calendar</a>
         <a href="page7_insight.html"><span class="left"><span class="ic">✦</span>Insight</span></a>
         </nav>
       <div class="sb-foot-group">
@@ -151,6 +138,10 @@
     <main class="maincard">
       <div class="top-row">
         <div class="h1 display">Dashboard</div>
+        <div class="plat-dd" id="platDD">
+          <button class="plat-dd-btn" id="platDDBtn" type="button">All platforms <span class="car">▾</span></button>
+          <div class="plat-dd-menu" id="platDDMenu"></div>
+        </div>
       </div>
 
       <div class="stat-row">
@@ -193,6 +184,24 @@
     if (n >= 1000) return (n/1000).toFixed(1).replace(/\.0$/,'') + 'k';
     return String(n);
   }
+
+  // ---- platform dropdown (top-right) ----
+  (function(){
+    const btn = document.getElementById('platDDBtn');
+    const menu = document.getElementById('platDDMenu');
+    const filter = CCR.getPlatformFilter();
+    const options = ['all', ...CCR.getAvailablePlatforms()];
+    btn.innerHTML = (filter === 'all' ? 'All platforms' : filter) + ' <span class="car">▾</span>';
+    menu.innerHTML = options.map(p => {
+      const label = p === 'all' ? 'All platforms' : p;
+      return `<a href="#" class="${p === filter ? 'active' : ''}" data-platform="${p}">${label}</a>`;
+    }).join('');
+    btn.onclick = (e) => { e.stopPropagation(); menu.classList.toggle('open'); };
+    menu.querySelectorAll('a').forEach(a => {
+      a.onclick = (e) => { e.preventDefault(); CCR.setPlatformFilter(a.dataset.platform); location.reload(); };
+    });
+    document.addEventListener('click', () => menu.classList.remove('open'));
+  })();
 
   const all = CCR.getFilteredPieces().map(CCR.derive).filter(p => p.publishedAt);
   all.sort((a,b) => new Date(a.publishedAt) - new Date(b.publishedAt));
@@ -266,8 +275,9 @@
   // pieces on the same list would imply their rates are on the same scale. ----
   (function(){
     const list = document.getElementById('perfList');
+    const PLAT_SHORT = { TikTok:'TT', RedNote:'RN', Instagram:'IG' };
     if (platformFilter === 'all'){
-      const PLAT_COLORS = { TikTok:'#241d18', RedNote:'#e0435a' };
+      const PLAT_COLORS = { TikTok:'#241d18', RedNote:'#e0435a', Instagram:'#c2185b' };
       const platforms = CCR.getAvailablePlatforms();
       let html = '';
       platforms.forEach(plat => {
@@ -276,9 +286,8 @@
         const top = platPieces.slice().sort((a,b) => b.orderConversionRate - a.orderConversionRate)[0];
         const diag = CCR.diagnose(top.id);
         const cls = diag.weakStage && diag.readings[diag.weakStage]==='below' ? 'below' : 'above';
-        const initial = (top.product||'?').slice(0,1);
         html += `<div class="perf-row">
-          <div class="perf-av" style="background:${PLAT_COLORS[plat]||'#8b8178'}">${initial}</div>
+          <div class="perf-av" style="background:${PLAT_COLORS[plat]||'#8b8178'};font-size:10px;">${PLAT_SHORT[plat]||plat.slice(0,2).toUpperCase()}</div>
           <div><div class="perf-name">${top.campaign}</div><div class="perf-sub">Best on ${plat} · ${top.product}</div></div>
           <div class="perf-val ${cls}">${(top.orderConversionRate*100).toFixed(1)}%</div>
         </div>`;
@@ -293,10 +302,9 @@
     list.innerHTML = ranked.map((p,i) => {
       const diag = CCR.diagnose(p.id);
       const cls = diag.weakStage && diag.readings[diag.weakStage]==='below' ? 'below' : 'above';
-      const initial = (p.product||'?').slice(0,1);
       const color = ['#e8583a','#4f9d92','#c98a2b'][i%3];
       return `<div class="perf-row">
-        <div class="perf-av" style="background:${color}">${initial}</div>
+        <div class="perf-av" style="background:${color}">#${i+1}</div>
         <div><div class="perf-name">${p.campaign}</div><div class="perf-sub">${p.product} · ${p.platform}</div></div>
         <div class="perf-val ${cls}">${(p.orderConversionRate*100).toFixed(1)}%</div>
       </div>`;

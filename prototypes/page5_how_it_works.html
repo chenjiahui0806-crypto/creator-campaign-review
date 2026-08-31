@@ -37,15 +37,6 @@
   .sb-nav a .ic{width:16px;text-align:center;}
   .sb-nav a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
   .sb-nav a.active .ic{color:var(--self);}
-  .sb-navgroup{position:relative;}
-  .sb-navmain{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
-  .sb-navmain.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
-  .sb-navmain.active .ic{color:var(--self, var(--accent));}
-  .sb-dropdown{display:none;flex-direction:column;padding-left:30px;gap:1px;margin-top:2px;margin-bottom:2px;}
-  .sb-navgroup:hover .sb-dropdown{display:flex;}
-  .sb-navgroup:hover .sb-navmain{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
-  .sb-navgroup:hover .sb-navmain .ic{color:var(--self, var(--accent));}
-  .sb-navmain:hover{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
   .sb-dropdown a{font-size:12px;font-weight:600;color:var(--faint);text-decoration:none;padding:7px 10px;border-radius:8px;}
   .sb-dropdown a:hover{background:var(--hair);color:var(--sub);}
 
@@ -108,22 +99,8 @@
       </div>
       <a class="sb-cta" href="page3_entry.html"><span class="plus">+</span>New Content</a>
       <nav class="sb-nav">
-        <div class="sb-navgroup">
-          <a class="sb-navmain" href="page0_dashboard.html" onclick="CCR.setPlatformFilter('all')"><span class="ic">▦</span>Dashboard</a>
-          <div class="sb-dropdown">
-            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('TikTok')">TikTok</a>
-            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('RedNote')">RedNote</a>
-            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
-          </div>
-        </div>
-        <div class="sb-navgroup">
-          <a class="sb-navmain" href="page1_calendar.html" onclick="CCR.setPlatformFilter('all')"><span class="ic">▤</span>Calendar</a>
-          <div class="sb-dropdown">
-            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('TikTok')">TikTok</a>
-            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('RedNote')">RedNote</a>
-            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
-          </div>
-        </div>
+        <a href="page0_dashboard.html"><span class="ic">▦</span>Dashboard</a>
+        <a href="page1_calendar.html"><span class="ic">▤</span>Calendar</a>
         <a href="page7_insight.html"><span class="ic">✦</span>Insight</a>
       </nav>
       <div class="sb-foot-group">

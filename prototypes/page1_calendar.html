@@ -37,15 +37,6 @@
   .sb-nav a .ic{width:16px;text-align:center;}
   .sb-nav a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
   .sb-nav a.active .ic{color:var(--self);}
-  .sb-navgroup{position:relative;}
-  .sb-navmain{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
-  .sb-navmain.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
-  .sb-navmain.active .ic{color:var(--self, var(--accent));}
-  .sb-dropdown{display:none;flex-direction:column;padding-left:30px;gap:1px;margin-top:2px;margin-bottom:2px;}
-  .sb-navgroup:hover .sb-dropdown{display:flex;}
-  .sb-navgroup:hover .sb-navmain{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
-  .sb-navgroup:hover .sb-navmain .ic{color:var(--self, var(--accent));}
-  .sb-navmain:hover{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
   .sb-dropdown a{font-size:12px;font-weight:600;color:var(--faint);text-decoration:none;padding:7px 10px;border-radius:8px;}
   .sb-dropdown a:hover{background:var(--hair);color:var(--sub);}
 
@@ -141,13 +132,15 @@
   .sw{width:11px;height:11px;border-radius:3px;}
   .hint{font-size:11px;color:var(--faint);margin-top:12px;}
 
-  .sb-platform-label{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:24px;margin-bottom:8px;}
-  .sb-platform{display:flex;flex-direction:column;gap:4px;}
-  .sb-platform button{display:flex;align-items:center;justify-content:space-between;font:inherit;font-size:13px;font-weight:700;color:var(--sub);background:none;border:1px solid transparent;padding:9px 12px;border-radius:10px;cursor:pointer;text-align:left;width:100%;}
-  .sb-platform button.active{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:0 1px 3px rgba(0,0,0,.05);}
-  .sb-platform button.active .sb-plat-dot{background:var(--self);}
-  .sb-plat-dot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex-shrink:0;}
-  .sb-platform button span.pname{display:flex;align-items:center;gap:8px;}
+  .plat-dd{position:relative;}
+  .plat-dd-btn{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:9px 15px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;}
+  .plat-dd-btn:hover{border-color:var(--self);}
+  .plat-dd-btn .car{font-size:10px;color:var(--faint);}
+  .plat-dd-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px;min-width:170px;box-shadow:0 10px 26px -10px rgba(0,0,0,.2);z-index:30;}
+  .plat-dd-menu.open{display:block;}
+  .plat-dd-menu a{display:block;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:9px 12px;border-radius:8px;}
+  .plat-dd-menu a:hover{background:var(--hair);}
+  .plat-dd-menu a.active{background:var(--accent-soft);color:var(--self);}
 </style>
 </head>
 <body>
@@ -162,22 +155,8 @@
       </div>
       <a class="sb-cta" href="page3_entry.html"><span class="plus">+</span>New Content</a>
       <nav class="sb-nav">
-        <div class="sb-navgroup">
-          <a class="sb-navmain" href="page0_dashboard.html" onclick="CCR.setPlatformFilter('all')"><span class="ic">▦</span>Dashboard</a>
-          <div class="sb-dropdown">
-            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('TikTok')">TikTok</a>
-            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('RedNote')">RedNote</a>
-            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
-          </div>
-        </div>
-        <div class="sb-navgroup">
-          <a class="sb-navmain active" href="page1_calendar.html" onclick="CCR.setPlatformFilter('all')"><span class="ic">▤</span>Calendar</a>
-          <div class="sb-dropdown">
-            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('TikTok')">TikTok</a>
-            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('RedNote')">RedNote</a>
-            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
-          </div>
-        </div>
+        <a href="page0_dashboard.html"><span class="ic">▦</span>Dashboard</a>
+        <a class="active" href="page1_calendar.html"><span class="ic">▤</span>Calendar</a>
       <a href="page7_insight.html"><span class="ic">✦</span>Insight</a>
       </nav>
       <div class="sb-foot-group">
@@ -201,6 +180,10 @@
           </div>
         </div>
         <div class="h-sub">Every campaign piece on its publish date. Color shows its order-conversion reading against your baseline.</div>
+      </div>
+      <div class="plat-dd" id="platDD">
+        <button class="plat-dd-btn" id="platDDBtn" type="button">All platforms <span class="car">▾</span></button>
+        <div class="plat-dd-menu" id="platDDMenu"></div>
       </div>
     </div>
   </div>
@@ -354,6 +337,24 @@
 
 <script src="js/engine.js"></script>
 <script>
+
+  // ---- platform dropdown (top-right) ----
+  (function(){
+    const btn = document.getElementById('platDDBtn');
+    const menu = document.getElementById('platDDMenu');
+    const filter = CCR.getPlatformFilter();
+    const options = ['all', ...CCR.getAvailablePlatforms()];
+    btn.innerHTML = (filter === 'all' ? 'All platforms' : filter) + ' <span class="car">▾</span>';
+    menu.innerHTML = options.map(p => {
+      const label = p === 'all' ? 'All platforms' : p;
+      return `<a href="#" class="${p === filter ? 'active' : ''}" data-platform="${p}">${label}</a>`;
+    }).join('');
+    btn.onclick = (e) => { e.stopPropagation(); menu.classList.toggle('open'); };
+    menu.querySelectorAll('a').forEach(a => {
+      a.onclick = (e) => { e.preventDefault(); CCR.setPlatformFilter(a.dataset.platform); location.reload(); };
+    });
+    document.addEventListener('click', () => menu.classList.remove('open'));
+  })();
 
   // hide any static month-grid event whose piece doesn't match the current filter
   (function(){
