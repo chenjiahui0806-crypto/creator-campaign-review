@@ -47,10 +47,20 @@
   .sb-nav a .ic{width:16px;text-align:center;}
   .sb-nav a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
   .sb-nav a.active .ic{color:var(--accent);}
+  .sb-navgroup{position:relative;}
+  .sb-navmain{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-navmain.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-navmain.active .ic{color:var(--self, var(--accent));}
+  .sb-dropdown{display:none;flex-direction:column;padding-left:30px;gap:1px;margin-top:2px;margin-bottom:2px;}
+  .sb-navgroup:hover .sb-dropdown{display:flex;}
+  .sb-dropdown a{font-size:12px;font-weight:600;color:var(--faint);text-decoration:none;padding:7px 10px;border-radius:8px;}
+  .sb-dropdown a:hover{background:var(--hair);color:var(--sub);}
+
   .sb-badge{width:16px;height:16px;border-radius:50%;background:var(--accent);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;}
   .sb-foot-group{margin-top:auto;display:flex;flex-direction:column;gap:2px;}
   .sb-foot-group a{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--faint);text-decoration:none;padding:10px 12px;border-radius:10px;}
   .sb-foot-group a:hover{background:var(--hair);color:var(--sub);}
+  .sb-foot-group a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
 
   .maincard{flex:1;background:var(--card);border-radius:20px;padding:30px 34px 36px;height:100%;overflow-y:auto;}
 
@@ -108,16 +118,29 @@
         <div class="sb-name">Creator Account</div>
         <div class="sb-role">TikTok · Sponsored content</div>
       </div>
-      <div class="sb-platform-label">Platform</div>
-      <div class="sb-platform" id="platformSwitcher"></div>
       <a class="sb-cta" href="page3_entry.html"><span class="plus">+</span>New Content</a>
       <nav class="sb-nav">
-        <a class="active" href="page0_dashboard.html"><span class="left"><span class="ic">▦</span>Dashboard</span></a>
-        <a href="page1_calendar.html"><span class="left"><span class="ic">▤</span>Calendar</span></a>
-        <a href="page6_insights.html"><span class="left"><span class="ic">◔</span>Insight</span></a>
-        <a href="page5_how_it_works.html"><span class="left"><span class="ic">⚙</span>How it works</span></a>
-      </nav>
+        <div class="sb-navgroup">
+          <a class="sb-navmain active" href="page0_dashboard.html" onclick="CCR.setPlatformFilter('all')"><span class="ic">▦</span>Dashboard</a>
+          <div class="sb-dropdown">
+            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('TikTok')">TikTok</a>
+            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('RedNote')">RedNote</a>
+            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
+          </div>
+        </div>
+        <div class="sb-navgroup">
+          <a class="sb-navmain" href="page1_calendar.html" onclick="CCR.setPlatformFilter('all')"><span class="ic">▤</span>Calendar</a>
+          <div class="sb-dropdown">
+            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('TikTok')">TikTok</a>
+            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('RedNote')">RedNote</a>
+            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
+          </div>
+        </div>
+        <a href="page6_insights.html"><span class="left"><span class="ic">◔</span>Findings</span></a>
+        <a href="page7_insight.html"><span class="left"><span class="ic">✦</span>Insight</span></a>
+        </nav>
       <div class="sb-foot-group">
+        <a href="page5_how_it_works.html"><span>⚙</span>How it works</a>
         <a href="#"><span>⚙</span>Settings</a>
         <a href="#"><span>⏻</span>Log out</a>
       </div>
@@ -152,7 +175,7 @@
           <a class="view-more" href="page1_calendar.html">View all →</a>
         </div>
         <div class="insights" id="recent-insights" style="margin-top:0;">
-          <div class="panel-head"><div class="panel-title display">Recent insights</div></div>
+          <div class="panel-head"><div class="panel-title display">Recent findings</div></div>
           <div class="panel-scroll" id="insightsList"></div>
           <a class="view-more" href="page6_insights.html">View all →</a>
         </div>
@@ -173,19 +196,6 @@
   const all = CCR.getFilteredPieces().map(CCR.derive).filter(p => p.publishedAt);
   all.sort((a,b) => new Date(a.publishedAt) - new Date(b.publishedAt));
   const platformFilter = CCR.getPlatformFilter();
-
-  // ---- platform switcher (sidebar) ----
-  (function(){
-    const el = document.getElementById('platformSwitcher');
-    const options = ['all', ...CCR.getAvailablePlatforms()];
-    el.innerHTML = options.map(p => {
-      const label = p === 'all' ? 'All platforms' : p;
-      return `<button class="${p === platformFilter ? 'active' : ''}" data-platform="${p}"><span class="pname"><span class="sb-plat-dot"></span>${label}</span></button>`;
-    }).join('');
-    el.querySelectorAll('button').forEach(btn => {
-      btn.onclick = () => { CCR.setPlatformFilter(btn.dataset.platform); location.reload(); };
-    });
-  })();
 
   document.getElementById('statPieces').textContent = all.length;
   document.getElementById('statViews').textContent = fmtCompact(all.reduce((s,p) => s + (p.views||0), 0));

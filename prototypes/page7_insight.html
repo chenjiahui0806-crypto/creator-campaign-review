@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#241d18; --sub:#8b8178; --faint:#b3a99d; --line:#e9ddd0; --hair:#f3ece2;
+    --bg:#fdf6ee; --card:#ffffff;
+    --above:#3d9668; --below:#c2483f; --within:#a89c8d; --amber:#c98a2b;
+    --above-bg:#e6f2ea; --below-bg:#f9e6e3; --within-bg:#f1ece4;
+    --self:#e8583a; --accent-soft:#fbe4da;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html, body{height:100%;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;overflow:hidden;}
+  .display{font-family:"Fraunces",Georgia,serif;font-weight:700;letter-spacing:-.015em;}
+
+  .frame{padding:34px;height:100vh;}
+  .shell{max-width:1400px;margin:0 auto;background:#f0c39e;border-radius:28px;padding:14px;display:flex;gap:14px;height:100%;overflow:hidden;}
+  .sidebar{width:220px;flex-shrink:0;background:#faf3ea;border-radius:20px;padding:26px 20px;display:flex;flex-direction:column;height:100%;overflow-y:auto;}
+  .sb-brand{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;}
+  .sb-brand .dot{width:9px;height:9px;border-radius:50%;background:var(--self);display:inline-block;}
+  .sb-profile{margin-top:32px;}
+  .sb-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--self),#f4a06f);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;}
+  .sb-name{font-size:14px;font-weight:800;margin-top:10px;}
+  .sb-role{font-size:11px;color:var(--sub);margin-top:1px;}
+  .sb-platform-label{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:24px;margin-bottom:8px;}
+  .sb-platform{display:flex;flex-direction:column;gap:4px;}
+  .sb-platform button{display:flex;align-items:center;justify-content:space-between;font:inherit;font-size:13px;font-weight:700;color:var(--sub);background:none;border:1px solid transparent;padding:9px 12px;border-radius:10px;cursor:pointer;text-align:left;width:100%;}
+  .sb-platform button.active{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-platform button.active .sb-plat-dot{background:var(--self);}
+  .sb-plat-dot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex-shrink:0;}
+  .sb-platform button span.pname{display:flex;align-items:center;gap:8px;}
+  .sb-cta{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;padding:13px;border-radius:14px;background:var(--self);color:#fff;font-size:14px;font-weight:800;text-decoration:none;box-shadow:0 4px 10px -3px rgba(232,88,58,.45);}
+  .sb-cta:hover{filter:brightness(1.05);}
+  .sb-cta .plus{font-size:17px;line-height:1;}
+  .sb-nav{margin-top:26px;display:flex;flex-direction:column;gap:4px;}
+  .sb-nav a{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-nav a .ic{width:16px;text-align:center;}
+  .sb-nav a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-nav a.active .ic{color:var(--self);}
+  .sb-navgroup{position:relative;}
+  .sb-navmain{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-navmain.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-navmain.active .ic{color:var(--self, var(--accent));}
+  .sb-dropdown{display:none;flex-direction:column;padding-left:30px;gap:1px;margin-top:2px;margin-bottom:2px;}
+  .sb-navgroup:hover .sb-dropdown{display:flex;}
+  .sb-dropdown a{font-size:12px;font-weight:600;color:var(--faint);text-decoration:none;padding:7px 10px;border-radius:8px;}
+  .sb-dropdown a:hover{background:var(--hair);color:var(--sub);}
+
+  .sb-foot-group{margin-top:auto;display:flex;flex-direction:column;gap:2px;}
+  .sb-foot-group a{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--faint);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-foot-group a:hover{background:var(--hair);color:var(--sub);}
+  .sb-foot-group a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .maincard{flex:1;background:var(--card);border-radius:20px;padding:30px 34px 40px;height:100%;overflow-y:auto;}
+
+  .h1{font-size:32px;}
+  .h-sub{font-size:13px;color:var(--sub);margin-top:8px;max-width:620px;line-height:1.6;}
+
+  .sec{margin-top:32px;}
+  .sec-h{font-size:19px;}
+  .sec-p{font-size:12.5px;color:var(--sub);margin-top:6px;max-width:640px;line-height:1.6;}
+
+  .mock-flag{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:4px 11px;border-radius:20px;background:var(--within-bg);color:var(--sub);font-size:10.5px;font-weight:700;}
+  .mock-flag .d{width:6px;height:6px;border-radius:50%;background:var(--faint);}
+
+  .tag-group{margin-top:18px;}
+  .tag-group-name{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);margin-bottom:10px;}
+  .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;border:1px solid var(--line);font-size:12.5px;font-weight:700;background:#fff;}
+  .tag-pill .heat{display:flex;gap:2px;}
+  .tag-pill .heat span{width:5px;height:5px;border-radius:50%;background:var(--hair);}
+  .tag-pill .heat span.on{background:var(--self);}
+
+  .sugg-list{margin-top:16px;display:flex;flex-direction:column;gap:10px;}
+  .sugg-card{border:1px solid var(--line);border-radius:12px;padding:15px 18px;display:flex;gap:14px;align-items:flex-start;}
+  .sugg-ic{width:30px;height:30px;border-radius:9px;background:var(--accent-soft);color:var(--self);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+  .sugg-text{font-size:13.5px;line-height:1.55;}
+  .sugg-text b{font-weight:800;}
+  .sugg-meta{font-size:11px;color:var(--faint);margin-top:4px;}
+
+  .empty{margin-top:16px;font-size:12.5px;color:var(--faint);}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="shell">
+
+    <aside class="sidebar">
+      <div class="sb-brand"><span class="dot"></span>Campaign Review</div>
+      <div class="sb-profile">
+        <div class="sb-avatar">CJ</div>
+        <div class="sb-name">Creator Account</div>
+        <div class="sb-role">TikTok · Sponsored content</div>
+      </div>
+      <a class="sb-cta" href="page3_entry.html"><span class="plus">+</span>New Content</a>
+      <nav class="sb-nav">
+        <div class="sb-navgroup">
+          <a class="sb-navmain" href="page0_dashboard.html" onclick="CCR.setPlatformFilter('all')"><span class="ic">▦</span>Dashboard</a>
+          <div class="sb-dropdown">
+            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('TikTok')">TikTok</a>
+            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('RedNote')">RedNote</a>
+            <a href="page0_dashboard.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
+          </div>
+        </div>
+        <div class="sb-navgroup">
+          <a class="sb-navmain" href="page1_calendar.html" onclick="CCR.setPlatformFilter('all')"><span class="ic">▤</span>Calendar</a>
+          <div class="sb-dropdown">
+            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('TikTok')">TikTok</a>
+            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('RedNote')">RedNote</a>
+            <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
+          </div>
+        </div>
+        <a href="page6_insights.html"><span class="ic">◔</span>Findings</a>
+        <a class="active" href="page7_insight.html"><span class="ic">✦</span>Insight</a>
+      </nav>
+      <div class="sb-foot-group">
+        <a href="page5_how_it_works.html"><span>⚙</span>How it works</a>
+        <a href="#"><span>⚙</span>Settings</a>
+        <a href="#"><span>⏻</span>Log out</a>
+      </div>
+    </aside>
+
+    <main class="maincard">
+      <div class="h1 display">Insight</div>
+      <div class="h-sub">Ideas for what to make next — what's trending right now, and what your own history says works for you.</div>
+
+      <div class="sec">
+        <div class="sec-h display">Trending tags</div>
+        <div class="sec-p">What's getting attention across each category right now.</div>
+        <div class="mock-flag"><span class="d"></span>Example content — not pulled from a live trends feed. Real trend data would need a platform API integration, which isn't part of this prototype.</div>
+        <div id="tagGroups"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h display">Based on your own history</div>
+        <div class="sec-p">These are computed from the pieces already in this browser — not trend data, just patterns in your own results.</div>
+        <div class="sugg-list" id="suggList"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="js/engine.js"></script>
+<script>
+
+  // ---- trending tags: illustrative example content only, clearly labeled
+  // above. A real version of this needs a platform trends API, which is
+  // out of scope for this prototype (same P1 category as automated ingestion). ----
+  const TAG_GROUPS = [
+    { name: 'Snacks & Food', tags: [
+      { tag: '#3MinuteMeals', heat: 5 }, { tag: '#PantryHaul', heat: 4 }, { tag: '#DupeOrNot', heat: 3 } ] },
+    { name: 'Skincare & Beauty', tags: [
+      { tag: '#GlassSkin', heat: 5 }, { tag: '#NightRoutine', heat: 4 }, { tag: '#SkinCycling', heat: 3 } ] },
+    { name: 'Home & Kitchen', tags: [
+      { tag: '#DeskSetup', heat: 4 }, { tag: '#SmallKitchenWin', heat: 3 }, { tag: '#OnePanMeals', heat: 4 } ] },
+  ];
+  document.getElementById('tagGroups').innerHTML = TAG_GROUPS.map(g => `
+    <div class="tag-group">
+      <div class="tag-group-name">${g.name}</div>
+      <div class="tag-row">
+        ${g.tags.map(t => `<span class="tag-pill">${t.tag}<span class="heat">${[1,2,3,4,5].map(i => `<span class="${i<=t.heat?'on':''}"></span>`).join('')}</span></span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // ---- content suggestions: real, computed from this browser's data ----
+  (function(){
+    const list = document.getElementById('suggList');
+    const all = CCR.getFilteredPieces().map(CCR.derive).filter(p => p.orderConversionRate != null);
+    const suggestions = [];
+
+    // format comparison
+    const byFormat = {};
+    all.forEach(p => { (byFormat[p.format] = byFormat[p.format] || []).push(p.orderConversionRate); });
+    const formatEntries = Object.entries(byFormat).filter(([,rates]) => rates.length >= 2);
+    if (formatEntries.length >= 2){
+      const avg = formatEntries.map(([fmt, rates]) => ({ fmt, avg: rates.reduce((a,b)=>a+b,0)/rates.length, n: rates.length }));
+      avg.sort((a,b) => b.avg - a.avg);
+      const best = avg[0], worst = avg[avg.length-1];
+      const bestLabel = best.fmt === 'daily_share' ? 'Daily share' : 'Unboxing';
+      const worstLabel = worst.fmt === 'daily_share' ? 'daily share' : 'unboxing';
+      suggestions.push({
+        icon: '▲',
+        text: `<b>${bestLabel}</b> has been your stronger format — averaging ${(best.avg*100).toFixed(1)}% order conversion across ${best.n} pieces, versus ${(worst.avg*100).toFixed(1)}% for ${worstLabel}.`,
+        meta: `Computed from ${best.n + worst.n} pieces with funnel data`
+      });
+    }
+
+    // rule hit rate by platform
+    const byPlatform = {};
+    all.forEach(p => {
+      const d = CCR.diagnose(p.id);
+      byPlatform[p.platform] = byPlatform[p.platform] || { total: 0, fired: 0 };
+      byPlatform[p.platform].total++;
+      if (d.fired.length) byPlatform[p.platform].fired++;
+    });
+    Object.entries(byPlatform).forEach(([plat, stats]) => {
+      if (stats.total < 2) return;
+      const rate = stats.fired / stats.total;
+      if (rate >= 0.5){
+        suggestions.push({
+          icon: '!',
+          text: `<b>${plat}</b> pieces have flagged an issue in ${stats.fired} of your last ${stats.total} — worth reviewing the Findings feed for that platform before your next piece.`,
+          meta: `${plat} · ${stats.total} pieces tracked`
+        });
+      }
+    });
+
+    // audience skew, if available
+    const withAudience = all.filter(p => p.purchasePropensityFemale != null);
+    if (withAudience.length){
+      const avgProp = withAudience.reduce((s,p) => s + p.purchasePropensityFemale, 0) / withAudience.length;
+      if (avgProp > 1.15){
+        suggestions.push({
+          icon: '♀',
+          text: `Across your pieces, women buy at <b>${avgProp.toFixed(2)}×</b> their share of the audience on average — content that leans into what resonates with that group has consistently converted better for you.`,
+          meta: `${withAudience.length} pieces with audience data`
+        });
+      }
+    }
+
+    if (!suggestions.length){
+      list.innerHTML = '<div class="empty">Not enough data yet to surface a pattern — add a few more pieces with funnel data.</div>';
+      return;
+    }
+    list.innerHTML = suggestions.map(s => `
+      <div class="sugg-card">
+        <div class="sugg-ic">${s.icon}</div>
+        <div><div class="sugg-text">${s.text}</div><div class="sugg-meta">${s.meta}</div></div>
+      </div>
+    `).join('');
+  })();
+</script>
+</body>
+</html>
