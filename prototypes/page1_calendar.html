@@ -43,6 +43,9 @@
   .sb-navmain.active .ic{color:var(--self, var(--accent));}
   .sb-dropdown{display:none;flex-direction:column;padding-left:30px;gap:1px;margin-top:2px;margin-bottom:2px;}
   .sb-navgroup:hover .sb-dropdown{display:flex;}
+  .sb-navgroup:hover .sb-navmain{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-navgroup:hover .sb-navmain .ic{color:var(--self, var(--accent));}
+  .sb-navmain:hover{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
   .sb-dropdown a{font-size:12px;font-weight:600;color:var(--faint);text-decoration:none;padding:7px 10px;border-radius:8px;}
   .sb-dropdown a:hover{background:var(--hair);color:var(--sub);}
 
@@ -175,7 +178,6 @@
             <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
           </div>
         </div>
-        <a href="page6_insights.html"><span class="ic">◔</span>Findings</a>
       <a href="page7_insight.html"><span class="ic">✦</span>Insight</a>
       </nav>
       <div class="sb-foot-group">

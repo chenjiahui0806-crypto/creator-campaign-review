@@ -42,7 +42,7 @@
   .sb-name{font-size:14px;font-weight:800;margin-top:10px;}
   .sb-role{font-size:11px;color:var(--sub);margin-top:1px;}
   .sb-nav{margin-top:26px;display:flex;flex-direction:column;gap:4px;}
-  .sb-nav a{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-nav a{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
   .sb-nav a .left{display:flex;align-items:center;gap:10px;}
   .sb-nav a .ic{width:16px;text-align:center;}
   .sb-nav a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
@@ -53,6 +53,9 @@
   .sb-navmain.active .ic{color:var(--self, var(--accent));}
   .sb-dropdown{display:none;flex-direction:column;padding-left:30px;gap:1px;margin-top:2px;margin-bottom:2px;}
   .sb-navgroup:hover .sb-dropdown{display:flex;}
+  .sb-navgroup:hover .sb-navmain{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-navgroup:hover .sb-navmain .ic{color:var(--self, var(--accent));}
+  .sb-navmain:hover{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
   .sb-dropdown a{font-size:12px;font-weight:600;color:var(--faint);text-decoration:none;padding:7px 10px;border-radius:8px;}
   .sb-dropdown a:hover{background:var(--hair);color:var(--sub);}
 
@@ -136,7 +139,6 @@
             <a href="page1_calendar.html" onclick="CCR.setPlatformFilter('Instagram')">Instagram</a>
           </div>
         </div>
-        <a href="page6_insights.html"><span class="left"><span class="ic">◔</span>Findings</span></a>
         <a href="page7_insight.html"><span class="left"><span class="ic">✦</span>Insight</span></a>
         </nav>
       <div class="sb-foot-group">
@@ -177,7 +179,6 @@
         <div class="insights" id="recent-insights" style="margin-top:0;">
           <div class="panel-head"><div class="panel-title display">Recent findings</div></div>
           <div class="panel-scroll" id="insightsList"></div>
-          <a class="view-more" href="page6_insights.html">View all →</a>
         </div>
       </div>
 
