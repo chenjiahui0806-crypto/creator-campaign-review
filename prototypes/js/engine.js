@@ -24,31 +24,31 @@ const CCR = (() => {
       gmv: 7072, unitPrice: 68, discount: 0,
       viewerFemale: 68, buyerFemale: 85 },
     { id: 'drink-brand-iced-tea-morning-ritual', platform: 'TikTok', product: 'Drink Brand', campaign: 'Iced Tea Morning Ritual',
-      publishedAt: '2026-07-08T08:15', format: 'daily_share', boost: 'organic',
+      publishedAt: '2026-02-08T08:15', format: 'daily_share', boost: 'organic',
       impressions: 15500, views: 10000, storeVisits: 1500, clicks: 870, orders: 228,
       completion3s: 70, completionRate: 33, avgWatchTime: 13.6,
       gmv: 7980, unitPrice: 35, discount: 0,
       viewerFemale: 60, buyerFemale: 63 },
     { id: 'air-fryer-brand-3min-weeknight-dinner', platform: 'TikTok', product: 'Air Fryer Brand', campaign: '3-Min Weeknight Dinner',
-      publishedAt: '2026-07-14T18:45', format: 'unboxing', boost: 'organic',
+      publishedAt: '2026-03-14T18:45', format: 'unboxing', boost: 'organic',
       impressions: 16000, views: 10500, storeVisits: 1700, clicks: 980, orders: 466,
       completion3s: 76, completionRate: 38, avgWatchTime: 15.2,
       gmv: 83880, unitPrice: 180, discount: 0,
       viewerFemale: 55, buyerFemale: 58 },
     { id: 'nut-brand-late-night-snack-list', platform: 'TikTok', product: 'Nut Brand', campaign: 'Late-Night Snack List',
-      publishedAt: '2026-07-18T21:50', format: 'daily_share', boost: 'organic',
+      publishedAt: '2026-04-18T21:50', format: 'daily_share', boost: 'organic',
       impressions: 15200, views: 9700, storeVisits: 1450, clicks: 880, orders: 350,
       completion3s: 74, completionRate: 36, avgWatchTime: 14.5,
       gmv: 15750, unitPrice: 45, discount: 0,
       viewerFemale: 66, buyerFemale: 80 },
     { id: 'air-fryer-brand-one-pan-breakfast', platform: 'TikTok', product: 'Air Fryer Brand', campaign: 'One-Pan Breakfast',
-      publishedAt: '2026-07-22T07:20', format: 'daily_share', boost: 'organic',
+      publishedAt: '2026-05-22T07:20', format: 'daily_share', boost: 'organic',
       impressions: 15800, views: 10200, storeVisits: 1600, clicks: 920, orders: 365,
       completion3s: 73, completionRate: 35, avgWatchTime: 14.0,
       gmv: 63875, unitPrice: 175, discount: 0,
       viewerFemale: 57, buyerFemale: 60 },
     { id: 'drink-brand-summer-sparkling-water', platform: 'TikTok', product: 'Drink Brand', campaign: 'Summer Sparkling Water',
-      publishedAt: '2026-07-26T12:30', format: 'unboxing', boost: 'organic',
+      publishedAt: '2026-06-26T12:30', format: 'unboxing', boost: 'organic',
       impressions: 15400, views: 9900, storeVisits: 1550, clicks: 860, orders: 226,
       completion3s: 69, completionRate: 32, avgWatchTime: 13.4,
       gmv: 8588, unitPrice: 38, discount: 0,
@@ -64,7 +64,7 @@ const CCR = (() => {
     // baseline from organic), and a second platform (RedNote) building its
     // own baseline from scratch. See /verification for how these were tuned.
     { id: 'nut-brand-snack-box-unboxing', platform: 'TikTok', product: 'Nut Brand', campaign: 'Snack Box Unboxing',
-      publishedAt: '2026-07-04T18:00', format: 'unboxing', boost: 'organic',
+      publishedAt: '2026-02-04T18:00', format: 'unboxing', boost: 'organic',
       impressions: 15600, views: 10100, storeVisits: 1400, clicks: 855, orders: 225,
       completion3s: 72, completionRate: 19, avgWatchTime: 9.6,
       gmv: 9900, unitPrice: 44, discount: 0,
@@ -82,35 +82,62 @@ const CCR = (() => {
       gmv: 7480, unitPrice: 44, discount: 0,
       viewerFemale: 59, buyerFemale: 61 },
     { id: 'skincare-brand-5-step-routine', platform: 'RedNote', product: 'Skincare Brand', campaign: '5-Step Routine',
-      publishedAt: '2026-07-12T21:00', format: 'unboxing', boost: 'organic',
+      publishedAt: '2026-02-12T21:00', format: 'unboxing', boost: 'organic',
       impressions: 12800, views: 9200, storeVisits: 1350, clicks: 790, orders: 230,
       completion3s: 78, completionRate: 41, avgWatchTime: 16.5,
       gmv: 16560, unitPrice: 72, discount: 0,
       viewerFemale: 88, buyerFemale: 91 },
     { id: 'skincare-brand-nighttime-ritual', platform: 'RedNote', product: 'Skincare Brand', campaign: 'Nighttime Ritual',
-      publishedAt: '2026-07-16T22:30', format: 'daily_share', boost: 'organic',
+      publishedAt: '2026-03-16T22:30', format: 'daily_share', boost: 'organic',
       impressions: 13100, views: 9500, storeVisits: 1400, clicks: 818, orders: 95,
       completion3s: 80, completionRate: 43, avgWatchTime: 17.0,
       gmv: 16760, unitPrice: 72, discount: 0,
       viewerFemale: 87, buyerFemale: 88 },
     { id: 'skincare-brand-glass-skin-tutorial', platform: 'RedNote', product: 'Skincare Brand', campaign: 'Glass Skin Tutorial',
-      publishedAt: '2026-07-19T20:00', format: 'unboxing', boost: 'organic',
+      publishedAt: '2026-04-19T20:00', format: 'unboxing', boost: 'organic',
       impressions: 13000, views: 9350, storeVisits: 1370, clicks: 800, orders: 222,
       completion3s: 79, completionRate: 42, avgWatchTime: 16.8,
       gmv: 15990, unitPrice: 72, discount: 0,
       viewerFemale: 89, buyerFemale: 90 },
     { id: 'nut-brand-protein-bites-debut', platform: 'TikTok', product: 'Nut Brand', campaign: 'Protein Bites Debut',
-      publishedAt: '2026-07-20T17:45', format: 'unboxing', boost: 'organic',
+      publishedAt: '2026-05-20T17:45', format: 'unboxing', boost: 'organic',
       impressions: 15700, views: 10200, storeVisits: 1500, clicks: 610, orders: 210,
       completion3s: 71, completionRate: 33, avgWatchTime: 13.9,
       gmv: 9240, unitPrice: 44, discount: 0,
       viewerFemale: 65, buyerFemale: 72 },
     { id: 'drink-brand-iced-latte-recipe', platform: 'TikTok', product: 'Drink Brand', campaign: 'Iced Latte Recipe',
-      publishedAt: '2026-07-24T13:15', format: 'daily_share', boost: 'organic',
+      publishedAt: '2026-06-24T13:15', format: 'daily_share', boost: 'organic',
       impressions: 15850, views: 10250, storeVisits: 1510, clicks: 900, orders: 200,
       completion3s: 70, completionRate: 32, avgWatchTime: 13.5,
       gmv: 4200, unitPrice: 44, discount: 0,
       viewerFemale: 60, buyerFemale: 62 },
+
+    // ---- fills out Feb-Jun so the calendar has more than one populated
+    // month to browse; no specific rule targeted, just plausible variety ----
+    { id: 'drink-brand-sparkling-lemonade', platform: 'TikTok', product: 'Drink Brand', campaign: 'Sparkling Lemonade',
+      publishedAt: '2026-03-05T17:00', format: 'unboxing', boost: 'organic',
+      impressions: 15600, views: 10100, storeVisits: 1480, clicks: 860, orders: 255,
+      completion3s: 71, completionRate: 34, avgWatchTime: 14.1,
+      gmv: 10710, unitPrice: 42, discount: 0,
+      viewerFemale: 60, buyerFemale: 63 },
+    { id: 'air-fryer-brand-weekend-brunch', platform: 'TikTok', product: 'Air Fryer Brand', campaign: 'Weekend Brunch',
+      publishedAt: '2026-04-09T09:15', format: 'daily_share', boost: 'organic',
+      impressions: 15900, views: 10400, storeVisits: 1650, clicks: 940, orders: 340,
+      completion3s: 74, completionRate: 36, avgWatchTime: 14.6,
+      gmv: 58480, unitPrice: 172, discount: 0,
+      viewerFemale: 56, buyerFemale: 59 },
+    { id: 'sheet-mask-brand-morning-glow', platform: 'TikTok', product: 'Sheet-Mask Brand', campaign: 'Morning Glow',
+      publishedAt: '2026-05-13T08:30', format: 'unboxing', boost: 'organic',
+      impressions: 15100, views: 9800, storeVisits: 1380, clicks: 815, orders: 245,
+      completion3s: 70, completionRate: 33, avgWatchTime: 13.8,
+      gmv: 13475, unitPrice: 55, discount: 0,
+      viewerFemale: 73, buyerFemale: 88 },
+    { id: 'skincare-brand-spf-layering', platform: 'RedNote', product: 'Skincare Brand', campaign: 'SPF Layering',
+      publishedAt: '2026-06-11T21:45', format: 'daily_share', boost: 'organic',
+      impressions: 13050, views: 9400, storeVisits: 1360, clicks: 795, orders: 238,
+      completion3s: 77, completionRate: 40, avgWatchTime: 16.2,
+      gmv: 17136, unitPrice: 72, discount: 0,
+      viewerFemale: 87, buyerFemale: 89 },
   ];
 
   // ---------------------------------------------------------------------
@@ -160,7 +187,12 @@ const CCR = (() => {
   }
 
   function getAvailablePlatforms() {
-    return [...new Set(getAllPieces().map(p => p.platform))].sort();
+    const present = new Set(getAllPieces().map(p => p.platform));
+    present.add('Instagram'); // shown as a model/placeholder even without real data yet
+    const PLATFORM_ORDER = ['TikTok', 'RedNote', 'Instagram'];
+    const ordered = PLATFORM_ORDER.filter(p => present.has(p));
+    const rest = [...present].filter(p => !PLATFORM_ORDER.includes(p)).sort();
+    return [...ordered, ...rest];
   }
 
   function getFilteredPieces() {

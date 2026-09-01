@@ -190,15 +190,8 @@
 
   <div class="toolbar">
     <div class="month-nav">
-      <select class="msel" id="monthSel">
-        <option>January</option><option>February</option><option>March</option>
-        <option>April</option><option>May</option><option>June</option>
-        <option selected>July</option><option>August</option><option>September</option>
-        <option>October</option><option>November</option><option>December</option>
-      </select>
-      <select class="msel" id="yearSel">
-        <option>2024</option><option>2025</option><option selected>2026</option><option>2027</option>
-      </select>
+      <select class="msel" id="monthSel"></select>
+      <select class="msel" id="yearSel"></select>
     </div>
     <div class="piece-nav" id="pieceNav">
       <button class="pnav-btn" id="prevPiece" title="上一条" aria-label="Previous piece">‹</button>
@@ -208,79 +201,7 @@
   </div>
 
   <!-- ============ MONTH ============ -->
-  <div class="month" id="monthView">
-    <div class="dow">Sun</div><div class="dow">Mon</div><div class="dow">Tue</div><div class="dow">Wed</div><div class="dow">Thu</div><div class="dow">Fri</div><div class="dow">Sat</div>
-
-    <div class="cell out"><span class="dnum">28</span></div>
-    <div class="cell out"><span class="dnum">29</span></div>
-    <div class="cell out"><span class="dnum">30</span></div>
-    <div class="cell today"><span class="dnum">1</span>
-      <a class="evt below" href="page2_detail.html?piece=nut-brand-office-snack-taste-test" data-piece="nut-brand-office-snack-taste-test"><div class="prod">Nut Brand</div><div class="camp">Office Snack Taste-Test</div><div class="time">7:30 PM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">2</span></div>
-    <div class="cell"><span class="dnum">3</span></div>
-    <div class="cell"><span class="dnum">4</span>
-      <a class="evt within" href="page4_review.html?piece=nut-brand-snack-box-unboxing" data-piece="nut-brand-snack-box-unboxing"><div class="prod">Nut Brand</div><div class="camp">Snack Box Unboxing</div><div class="time">6:00 PM</div></a>
-    </div>
-
-    <div class="cell"><span class="dnum">5</span></div>
-    <div class="cell"><span class="dnum">6</span>
-      <a class="evt within" href="page4_review.html?piece=air-fryer-brand-flash-sale-push" data-piece="air-fryer-brand-flash-sale-push"><div class="prod">Air Fryer Brand</div><div class="camp">Flash Sale Push</div><div class="time">8:00 PM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">7</span></div>
-    <div class="cell"><span class="dnum">8</span>
-      <a class="evt within" href="page2_detail.html?piece=drink-brand-iced-tea-morning-ritual" data-piece="drink-brand-iced-tea-morning-ritual"><div class="prod">Drink Brand</div><div class="camp">Iced Tea Morning Ritual</div><div class="time">8:15 AM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">9</span></div>
-    <div class="cell"><span class="dnum">10</span>
-      <a class="evt within" href="page4_review.html?piece=drink-brand-cold-brew-review" data-piece="drink-brand-cold-brew-review"><div class="prod">Drink Brand</div><div class="camp">Cold Brew Review</div><div class="time">9:30 AM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">11</span></div>
-
-    <div class="cell"><span class="dnum">12</span>
-      <a class="evt above" href="page4_review.html?piece=skincare-brand-5-step-routine" data-piece="skincare-brand-5-step-routine"><div class="prod">Skincare Brand</div><div class="camp">5-Step Routine</div><div class="time">9:00 PM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">13</span></div>
-    <div class="cell"><span class="dnum">14</span>
-      <a class="evt above" href="page2_detail.html?piece=air-fryer-brand-3min-weeknight-dinner" data-piece="air-fryer-brand-3min-weeknight-dinner"><div class="prod">Air Fryer Brand</div><div class="camp">3-Min Weeknight Dinner</div><div class="time">6:45 PM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">15</span></div>
-    <div class="cell"><span class="dnum">16</span>
-      <a class="evt below" href="page4_review.html?piece=skincare-brand-nighttime-ritual" data-piece="skincare-brand-nighttime-ritual"><div class="prod">Skincare Brand</div><div class="camp">Nighttime Ritual</div><div class="time">10:30 PM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">17</span></div>
-    <div class="cell"><span class="dnum">18</span>
-      <a class="evt above" href="page2_detail.html?piece=nut-brand-late-night-snack-list" data-piece="nut-brand-late-night-snack-list"><div class="prod">Nut Brand</div><div class="camp">Late-Night Snack List</div><div class="time">9:50 PM</div></a>
-    </div>
-
-    <div class="cell"><span class="dnum">19</span>
-      <a class="evt above" href="page4_review.html?piece=skincare-brand-glass-skin-tutorial" data-piece="skincare-brand-glass-skin-tutorial"><div class="prod">Skincare Brand</div><div class="camp">Glass Skin Tutorial</div><div class="time">8:00 PM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">20</span>
-      <a class="evt within" href="page4_review.html?piece=nut-brand-protein-bites-debut" data-piece="nut-brand-protein-bites-debut"><div class="prod">Nut Brand</div><div class="camp">Protein Bites Debut</div><div class="time">5:45 PM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">21</span></div>
-    <div class="cell"><span class="dnum">22</span>
-      <a class="evt above" href="page2_detail.html?piece=air-fryer-brand-one-pan-breakfast" data-piece="air-fryer-brand-one-pan-breakfast"><div class="prod">Air Fryer Brand</div><div class="camp">One-Pan Breakfast</div><div class="time">7:20 AM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">23</span></div>
-    <div class="cell"><span class="dnum">24</span>
-      <a class="evt below" href="page4_review.html?piece=drink-brand-iced-latte-recipe" data-piece="drink-brand-iced-latte-recipe"><div class="prod">Drink Brand</div><div class="camp">Iced Latte Recipe</div><div class="time">1:15 PM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">25</span></div>
-
-    <div class="cell"><span class="dnum">26</span>
-      <a class="evt within" href="page2_detail.html?piece=drink-brand-summer-sparkling-water" data-piece="drink-brand-summer-sparkling-water"><div class="prod">Drink Brand</div><div class="camp">Summer Sparkling Water</div><div class="time">12:30 PM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">27</span></div>
-    <div class="cell"><span class="dnum">28</span></div>
-    <div class="cell"><span class="dnum">29</span>
-      <a class="evt below" href="page2_detail.html?piece=sheet-mask-brand-late-night-rescue-mask" data-piece="sheet-mask-brand-late-night-rescue-mask"><div class="prod">Sheet-Mask Brand</div><div class="camp">Late-Night Rescue Mask</div><div class="time">10:10 PM</div></a>
-    </div>
-    <div class="cell"><span class="dnum">30</span></div>
-    <div class="cell"><span class="dnum">31</span></div>
-    <div class="cell out"><span class="dnum">1</span></div>
-  </div>
+  <div class="month" id="monthView"></div>
 
   <!-- ============ DAY ============ -->
   <div class="daywrap" id="dayView">
@@ -356,16 +277,6 @@
     document.addEventListener('click', () => menu.classList.remove('open'));
   })();
 
-  // hide any static month-grid event whose piece doesn't match the current filter
-  (function(){
-    const filter = CCR.getPlatformFilter();
-    if (filter === 'all') return;
-    document.querySelectorAll('#monthView .evt[data-piece]').forEach(evt => {
-      const piece = CCR.getPieceById(evt.dataset.piece);
-      if (!piece || piece.platform !== filter) evt.style.display = 'none';
-    });
-  })();
-
   const mv=document.getElementById('monthView'), dv=document.getElementById('dayView');
   const pieceNav=document.getElementById('pieceNav');
 
@@ -383,84 +294,45 @@
     t.onclick=()=>t.classList.toggle('done');
   });
 
-  // Every piece currently on the month grid, in publish-date order. The prev/next
-  // arrows step through this list. Only the Jul 1 piece has full diagnosis and
-  // action-list content written; the other pieces update the header only (title,
-  // date, conversion badge) so the demo shows realistic wayfinding across pieces
-  // without fabricating diagnosis text we don't have.
-  const pieces = [
-    { id:'nut-brand-office-snack-taste-test', month:'July', year:'2026', date:'Wednesday, July 1', shortDate:'Jul 1, 2026',
-      prod:'Nut Brand', camp:'Office Snack Taste-Test',
-      meta:'Unboxing · TikTok · organic · published Jul 1, 7:30 PM',
-      cvr:'Order 8.0%', badge:'▼ below baseline', cls:'below' },
-    { id:'nut-brand-snack-box-unboxing', month:'July', year:'2026', date:'Saturday, July 4', shortDate:'Jul 4, 2026',
-      prod:'Nut Brand', camp:'Snack Box Unboxing',
-      meta:'Unboxing · TikTok · organic · published Jul 4, 6:00 PM',
-      cvr:'Order 16.1%', badge:'Within baseline', cls:'within' },
-    { id:'air-fryer-brand-flash-sale-push', month:'July', year:'2026', date:'Monday, July 6', shortDate:'Jul 6, 2026',
-      prod:'Air Fryer Brand', camp:'Flash Sale Push',
-      meta:'Unboxing · TikTok · boosted · published Jul 6, 8:00 PM',
-      cvr:'Order 15.0%', badge:'Building baseline', cls:'within' },
-    { id:'drink-brand-iced-tea-morning-ritual', month:'July', year:'2026', date:'Wednesday, July 8', shortDate:'Jul 8, 2026',
-      prod:'Drink Brand', camp:'Iced Tea Morning Ritual',
-      meta:'Daily Share · TikTok · organic · published Jul 8, 8:15 AM',
-      cvr:'Order 15.2%', badge:'Within baseline', cls:'within' },
-    { id:'drink-brand-cold-brew-review', month:'July', year:'2026', date:'Friday, July 10', shortDate:'Jul 10, 2026',
-      prod:'Drink Brand', camp:'Cold Brew Review',
-      meta:'Daily Share · TikTok · organic · published Jul 10, 9:30 AM',
-      cvr:'Order 13.9%', badge:'Within baseline', cls:'within' },
-    { id:'skincare-brand-5-step-routine', month:'July', year:'2026', date:'Sunday, July 12', shortDate:'Jul 12, 2026',
-      prod:'Skincare Brand', camp:'5-Step Routine',
-      meta:'Unboxing · RedNote · organic · published Jul 12, 9:00 PM',
-      cvr:'Order 17.0%', badge:'▲ above baseline', cls:'above' },
-    { id:'air-fryer-brand-3min-weeknight-dinner', month:'July', year:'2026', date:'Tuesday, July 14', shortDate:'Jul 14, 2026',
-      prod:'Air Fryer Brand', camp:'3-Min Weeknight Dinner',
-      meta:'Unboxing · TikTok · organic · published Jul 14, 6:45 PM',
-      cvr:'Order 27.4%', badge:'▲ above baseline', cls:'above' },
-    { id:'skincare-brand-nighttime-ritual', month:'July', year:'2026', date:'Thursday, July 16', shortDate:'Jul 16, 2026',
-      prod:'Skincare Brand', camp:'Nighttime Ritual',
-      meta:'Daily Share · RedNote · organic · published Jul 16, 10:30 PM',
-      cvr:'Order 6.8%', badge:'▼ below baseline', cls:'below' },
-    { id:'nut-brand-late-night-snack-list', month:'July', year:'2026', date:'Saturday, July 18', shortDate:'Jul 18, 2026',
-      prod:'Nut Brand', camp:'Late-Night Snack List',
-      meta:'Daily Share · TikTok · organic · published Jul 18, 9:50 PM',
-      cvr:'Order 24.1%', badge:'▲ above baseline', cls:'above' },
-    { id:'skincare-brand-glass-skin-tutorial', month:'July', year:'2026', date:'Sunday, July 19', shortDate:'Jul 19, 2026',
-      prod:'Skincare Brand', camp:'Glass Skin Tutorial',
-      meta:'Unboxing · RedNote · organic · published Jul 19, 8:00 PM',
-      cvr:'Order 16.2%', badge:'▲ above baseline', cls:'above' },
-    { id:'nut-brand-protein-bites-debut', month:'July', year:'2026', date:'Monday, July 20', shortDate:'Jul 20, 2026',
-      prod:'Nut Brand', camp:'Protein Bites Debut',
-      meta:'Unboxing · TikTok · organic · published Jul 20, 5:45 PM',
-      cvr:'Order 14.0%', badge:'Within baseline', cls:'within' },
-    { id:'air-fryer-brand-one-pan-breakfast', month:'July', year:'2026', date:'Wednesday, July 22', shortDate:'Jul 22, 2026',
-      prod:'Air Fryer Brand', camp:'One-Pan Breakfast',
-      meta:'Daily Share · TikTok · organic · published Jul 22, 7:20 AM',
-      cvr:'Order 22.8%', badge:'▲ above baseline', cls:'above' },
-    { id:'drink-brand-iced-latte-recipe', month:'July', year:'2026', date:'Friday, July 24', shortDate:'Jul 24, 2026',
-      prod:'Drink Brand', camp:'Iced Latte Recipe',
-      meta:'Daily Share · TikTok · organic · published Jul 24, 1:15 PM',
-      cvr:'Order 13.2%', badge:'▼ below baseline', cls:'below' },
-    { id:'drink-brand-summer-sparkling-water', month:'July', year:'2026', date:'Sunday, July 26', shortDate:'Jul 26, 2026',
-      prod:'Drink Brand', camp:'Summer Sparkling Water',
-      meta:'Unboxing · TikTok · organic · published Jul 26, 12:30 PM',
-      cvr:'Order 14.6%', badge:'Within baseline', cls:'within' },
-    { id:'sheet-mask-brand-late-night-rescue-mask', month:'July', year:'2026', date:'Wednesday, July 29', shortDate:'Jul 29, 2026',
-      prod:'Sheet-Mask Brand', camp:'Late-Night Rescue Mask',
-      meta:'Unboxing · TikTok · organic · published Jul 29, 10:10 PM',
-      cvr:'Order 9.3%', badge:'▼ below baseline', cls:'below' }
-  ];
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DOW_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const DEMO_TODAY = new Date('2026-07-01T12:00:00'); // fixed reference date so "today" styling matches the demo narrative, not the real device clock
+  const DEMO_TODAY_MONTH_NAME = MONTH_NAMES[DEMO_TODAY.getMonth()];
 
-  // apply the site-wide platform filter to the day-view piece list too
-  (function(){
-    const filter = CCR.getPlatformFilter();
-    if (filter === 'all') return;
-    for (let i = pieces.length - 1; i >= 0; i--){
-      const full = CCR.getPieceById(pieces[i].id);
-      if (!full || full.platform !== filter) pieces.splice(i, 1);
-    }
-  })();
+  // Builds the day-view display shape (date labels, cvr text, badge, color
+  // class) for one raw CCR piece by running it through the real engine —
+  // no more hand-written duplicate numbers per piece.
+  function buildPieceView(raw){
+    const d = new Date(raw.publishedAt);
+    const diag = CCR.diagnose(raw.id);
+    const reading = diag.weakStage ? diag.readings[diag.weakStage] : null;
+    let cls, badge;
+    if (reading === 'below'){ cls = 'below'; badge = '▼ below baseline'; }
+    else if (diag.sampleSize < 2){ cls = 'within'; badge = 'Building baseline'; }
+    else if (reading === 'above'){ cls = 'above'; badge = '▲ above baseline'; }
+    else { cls = 'within'; badge = 'Within baseline'; }
+    const orderPct = diag.piece.orderConversionRate != null ? (diag.piece.orderConversionRate*100).toFixed(1) + '%' : '—';
+    const timeLabel = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    const monthName = MONTH_NAMES[d.getMonth()];
+    return {
+      id: raw.id, month: monthName, year: String(d.getFullYear()), day: d.getDate(), timeLabel,
+      date: `${DOW_NAMES[d.getDay()]}, ${monthName} ${d.getDate()}`,
+      shortDate: `${monthName.slice(0,3)} ${d.getDate()}, ${d.getFullYear()}`,
+      prod: raw.product, camp: raw.campaign,
+      meta: `${raw.format === 'unboxing' ? 'Unboxing' : 'Daily Share'} · ${raw.platform} · ${raw.boost} · published ${monthName.slice(0,3)} ${d.getDate()}, ${timeLabel}`,
+      cvr: `Order ${orderPct}`, badge, cls,
+      // seed pieces with a hand-written detail page keep their richer static
+      // review; everything else (including anything entered live) routes to
+      // the engine-computed review
+      href: (raw.id === 'nut-brand-office-snack-taste-test') ? `page2_detail.html?piece=${raw.id}` : `page4_review.html?piece=${raw.id}`,
+    };
+  }
 
+  function getAllPieceViews(){
+    return CCR.getFilteredPieces().map(buildPieceView).sort((a,b) => new Date(a.year, MONTH_NAMES.indexOf(a.month), a.day) - new Date(b.year, MONTH_NAMES.indexOf(b.month), b.day));
+  }
+
+  let pieces = getAllPieceViews();
   let curIdx = 0;
   let monthPieces = [];
 
@@ -470,10 +342,75 @@
         dcCamp=document.getElementById('dcCamp'), dcMeta=document.getElementById('dcMeta'),
         dcCvr=document.getElementById('dcCvr'), dcLbl=document.getElementById('dcLbl'),
         pnavCount=document.getElementById('pnavCount'),
-        prevBtn=document.getElementById('prevPiece'), nextBtn=document.getElementById('nextPiece');
+        prevBtn=document.getElementById('prevPiece'), nextBtn=document.getElementById('nextPiece'),
+        monthViewEl=document.getElementById('monthView');
 
-  // Scopes the prev/next walk to whatever month + year the dropdowns are set to,
-  // matching the day-view's own month/year selectors instead of ignoring them.
+  // ------------------------------------------------------------------
+  // Month/year dropdowns: only ever list combinations that actually have
+  // a piece, so switching never lands on a silently-empty month.
+  // ------------------------------------------------------------------
+  function populateMonthYearSelects(){
+    const monthsPresent = [...new Set(pieces.map(p => p.month))].sort((a,b) => MONTH_NAMES.indexOf(a) - MONTH_NAMES.indexOf(b));
+    const yearsPresent = [...new Set(pieces.map(p => p.year))].sort();
+
+    const prevMonth = monthSel.value, prevYear = yearSel.value;
+    monthSel.innerHTML = monthsPresent.map(m => `<option>${m}</option>`).join('');
+    yearSel.innerHTML = yearsPresent.map(y => `<option>${y}</option>`).join('');
+
+    if (monthsPresent.includes(prevMonth)) monthSel.value = prevMonth;
+    if (yearsPresent.includes(prevYear)) yearSel.value = prevYear;
+    if (!monthSel.value || !monthsPresent.includes(monthSel.value)){
+      // default to whichever month has the most pieces, preferring the demo's reference month if tied
+      const counts = {};
+      pieces.forEach(p => { counts[p.month] = (counts[p.month]||0) + 1; });
+      monthSel.value = monthsPresent.slice().sort((a,b) => (counts[b]||0) - (counts[a]||0) || (a===DEMO_TODAY_MONTH_NAME?-1:0))[0] || monthsPresent[0];
+    }
+    if (!yearSel.value || !yearsPresent.includes(yearSel.value)) yearSel.value = yearsPresent[0];
+  }
+
+  // ------------------------------------------------------------------
+  // Month grid: fully computed from real dates, not a hand-placed static
+  // block. Renders whichever month/year the dropdowns currently hold.
+  // ------------------------------------------------------------------
+  function renderMonthGrid(){
+    const monthName = monthSel.value, year = Number(yearSel.value);
+    const monthIndex = MONTH_NAMES.indexOf(monthName);
+    if (monthIndex === -1 || !year){ monthViewEl.innerHTML = ''; return; }
+
+    const firstDow = new Date(year, monthIndex, 1).getDay();
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, monthIndex, 0).getDate();
+
+    const byDay = {};
+    pieces.filter(p => p.month === monthName && p.year === String(year)).forEach(p => {
+      (byDay[p.day] = byDay[p.day] || []).push(p);
+    });
+
+    let html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div class="dow">${d}</div>`).join('');
+
+    for (let i = firstDow - 1; i >= 0; i--){
+      html += `<div class="cell out"><span class="dnum">${daysInPrevMonth - i}</span></div>`;
+    }
+    for (let day = 1; day <= daysInMonth; day++){
+      const isToday = DEMO_TODAY.getFullYear() === year && DEMO_TODAY.getMonth() === monthIndex && DEMO_TODAY.getDate() === day;
+      let cell = `<div class="cell${isToday ? ' today' : ''}"><span class="dnum">${day}</span>`;
+      (byDay[day] || []).forEach(p => {
+        cell += `<a class="evt ${p.cls}" href="${p.href}" data-piece="${p.id}"><div class="prod">${p.prod}</div><div class="camp">${p.camp}</div><div class="time">${p.timeLabel}</div></a>`;
+      });
+      cell += '</div>';
+      html += cell;
+    }
+    const totalSoFar = firstDow + daysInMonth;
+    const trailing = (7 - (totalSoFar % 7)) % 7;
+    for (let i = 1; i <= trailing; i++){
+      html += `<div class="cell out"><span class="dnum">${i}</span></div>`;
+    }
+    monthViewEl.innerHTML = html;
+  }
+
+  // ------------------------------------------------------------------
+  // Day view: prev/next steps through whatever month is currently selected.
+  // ------------------------------------------------------------------
   function refreshMonthPieces(){
     monthPieces = pieces.filter(p => p.month === monthSel.value && p.year === yearSel.value);
     curIdx = 0;
@@ -503,7 +440,7 @@
     dcLbl.textContent = p.badge;
     dcLbl.className = 'lbl ' + p.cls;
     dayCard.className = 'day-card ' + p.cls;
-    dcTop.onclick = () => location.href = 'page2_detail.html?piece=' + p.id;
+    dcTop.onclick = () => location.href = p.href;
     pnavCount.innerHTML = `<b>${curIdx + 1}</b> / ${monthPieces.length} pieces this month`;
   }
 
@@ -516,76 +453,13 @@
     renderPiece();
   };
 
-  monthSel.onchange = () => { refreshMonthPieces(); renderPiece(); };
-  yearSel.onchange = () => { refreshMonthPieces(); renderPiece(); };
+  monthSel.onchange = () => { refreshMonthPieces(); renderMonthGrid(); renderPiece(); };
+  yearSel.onchange = () => { refreshMonthPieces(); renderMonthGrid(); renderPiece(); };
 
-  // ------------------------------------------------------------------
-  // Pull in anything saved from the entry form (page3_entry.html) and
-  // fold it into both the month grid (if it falls in July 2026, the
-  // only month this static grid renders) and the `pieces` array the day
-  // view already walks through. New pieces route to page4_review.html,
-  // the live-computed diagnosis, rather than the static page2_detail.html.
-  // ------------------------------------------------------------------
-  function injectUserPieces(){
-    if (typeof CCR === 'undefined') return;
-    const platformFilter = CCR.getPlatformFilter();
-    const userPieces = CCR.getUserPieces().filter(up => platformFilter === 'all' || up.platform === platformFilter);
-    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const dowNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-    userPieces.forEach(up => {
-      const d = new Date(up.publishedAt);
-      const monthName = monthNames[d.getMonth()];
-      const year = String(d.getFullYear());
-      const dateNum = d.getDate();
-      const timeLabel = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-
-      const diag = CCR.diagnose(up.id);
-      const cls = diag.weakStage && diag.readings[diag.weakStage] === 'below' ? 'below'
-                : diag.sampleSize < 2 ? 'within'
-                : 'above';
-      const orderPct = diag.piece.orderConversionRate != null ? (diag.piece.orderConversionRate*100).toFixed(1) + '%' : '—';
-
-      // fold into the day-view pieces array regardless of month, so the
-      // prev/next walker sees it once that month is selected
-      pieces.push({
-        id: up.id, month: monthName, year: year,
-        date: `${dowNames[d.getDay()]}, ${monthName} ${dateNum}`,
-        shortDate: `${monthName.slice(0,3)} ${dateNum}, ${year}`,
-        prod: up.product, camp: up.campaign,
-        meta: `${up.format === 'unboxing' ? 'Unboxing' : 'Daily Share'} · published ${monthName.slice(0,3)} ${dateNum}, ${timeLabel} · added this session`,
-        cvr: `Order ${orderPct}`,
-        badge: cls === 'below' ? '▼ below baseline' : cls === 'above' ? '▲ above baseline' : 'Building baseline',
-        cls
-      });
-
-      // only render onto the visible grid if it's July 2026, the one
-      // month this static grid draws cells for
-      if (monthName === 'July' && year === '2026'){
-        const cells = document.querySelectorAll('#monthView .cell:not(.out)');
-        let targetCell = null;
-        cells.forEach(c => {
-          if (c.querySelector('.dnum').textContent === String(dateNum)) targetCell = c;
-        });
-        if (targetCell){
-          const a = document.createElement('a');
-          a.className = `evt ${cls}`;
-          a.href = `page4_review.html?piece=${up.id}`;
-          a.innerHTML = `<div class="prod">${up.product}</div><div class="camp">${up.campaign}</div><div class="time">${timeLabel}</div>`;
-          targetCell.appendChild(a);
-        }
-      }
-    });
-
-    if (userPieces.length){
-      refreshMonthPieces();
-      if (dv.classList.contains('show')) renderPiece();
-    }
-  }
-
+  populateMonthYearSelects();
   refreshMonthPieces();
+  renderMonthGrid();
   renderPiece();
-  injectUserPieces();
 </script>
 </body>
 </html>
