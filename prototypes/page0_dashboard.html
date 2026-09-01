@@ -292,23 +292,25 @@
           <div class="perf-val ${cls}">${(top.orderConversionRate*100).toFixed(1)}%</div>
         </div>`;
       });
-      html += '<div class="empty-note" style="margin-top:6px;">Each platform\'s own top piece, read against its own baseline.</div>';
+      html += '<div class="empty-note" style="margin-top:6px;">Each circle\'s color and letters mark which platform that piece is on.</div>';
       list.innerHTML = html || '<div class="empty-note">No pieces with funnel data yet.</div>';
       return;
     }
     const ranked = all.filter(p => p.orderConversionRate != null)
       .slice().sort((a,b) => b.orderConversionRate - a.orderConversionRate).slice(0,3);
     if (!ranked.length){ list.innerHTML = '<div class="empty-note">No pieces with funnel data yet.</div>'; return; }
-    list.innerHTML = ranked.map((p,i) => {
+    const RANK_COLORS = ['#c9a227', '#9aa0a8', '#b5651d']; // gold / silver / bronze
+    let rankHtml = ranked.map((p,i) => {
       const diag = CCR.diagnose(p.id);
       const cls = diag.weakStage && diag.readings[diag.weakStage]==='below' ? 'below' : 'above';
-      const color = ['#e8583a','#4f9d92','#c98a2b'][i%3];
       return `<div class="perf-row">
-        <div class="perf-av" style="background:${color}">#${i+1}</div>
+        <div class="perf-av" style="background:${RANK_COLORS[i]}">#${i+1}</div>
         <div><div class="perf-name">${p.campaign}</div><div class="perf-sub">${p.product} · ${p.platform}</div></div>
         <div class="perf-val ${cls}">${(p.orderConversionRate*100).toFixed(1)}%</div>
       </div>`;
     }).join('');
+    rankHtml += '<div class="empty-note" style="margin-top:6px;">Circle color and number show rank within this platform — 1st (gold), 2nd (silver), 3rd (bronze).</div>';
+    list.innerHTML = rankHtml;
   })();
 
   // ---- recent insights: pieces with fired rules, most recent first. This
