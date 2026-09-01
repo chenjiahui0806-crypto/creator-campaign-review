@@ -80,7 +80,8 @@
   .cell.out{background:#fafbfc;}
   .cell .dnum{font-size:11px;font-weight:600;color:var(--faint);}
   .cell.today .dnum{color:var(--self);font-weight:800;}
-  .evt{border-radius:6px;padding:5px 7px;cursor:pointer;border-left:3px solid var(--within);background:var(--within-bg);display:block;text-decoration:none;color:inherit;}
+  .evt{position:relative;border-radius:6px;padding:5px 7px;cursor:pointer;border-left:3px solid var(--within);background:var(--within-bg);display:block;text-decoration:none;color:inherit;}
+  .evt .plat-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;}
   .evt:hover{filter:brightness(.97);}
   .evt.above{border-left-color:var(--above);background:var(--above-bg);}
   .evt.below{border-left-color:var(--below);background:var(--below-bg);}
@@ -130,6 +131,7 @@
   .legend{display:flex;gap:16px;margin-top:20px;padding:11px 16px;background:#f7f8fa;border:1px solid var(--line);border-radius:10px;font-size:11px;color:var(--sub);}
   .legend span{display:flex;align-items:center;gap:6px;}
   .sw{width:11px;height:11px;border-radius:3px;}
+  .sw.round{border-radius:50%;width:9px;height:9px;}
   .hint{font-size:11px;color:var(--faint);margin-top:12px;}
 
   .plat-dd{position:relative;}
@@ -249,6 +251,7 @@
     <span><span class="sw" style="background:var(--below)"></span>Below your baseline</span>
     <span><span class="sw" style="background:var(--within)"></span>Within your normal range</span>
   </div>
+  <div class="legend" id="platLegend" style="margin-top:8px;"></div>
   <div class="hint">Each label shows the product and campaign. Tap any piece to open its review. Date-range filtering lives in the list view.</div>
 
 </div>
@@ -318,7 +321,7 @@
       id: raw.id, month: monthName, year: String(d.getFullYear()), day: d.getDate(), timeLabel,
       date: `${DOW_NAMES[d.getDay()]}, ${monthName} ${d.getDate()}`,
       shortDate: `${monthName.slice(0,3)} ${d.getDate()}, ${d.getFullYear()}`,
-      prod: raw.product, camp: raw.campaign,
+      prod: raw.product, camp: raw.campaign, platform: raw.platform,
       meta: `${raw.format === 'unboxing' ? 'Unboxing' : 'Daily Share'} · ${raw.platform} · ${raw.boost} · published ${monthName.slice(0,3)} ${d.getDate()}, ${timeLabel}`,
       cvr: `Order ${orderPct}`, badge, cls,
       // seed pieces with a hand-written detail page keep their richer static
@@ -372,6 +375,8 @@
   // Month grid: fully computed from real dates, not a hand-placed static
   // block. Renders whichever month/year the dropdowns currently hold.
   // ------------------------------------------------------------------
+  const PLAT_COLORS = { TikTok:'#241d18', RedNote:'#e0435a', Instagram:'#c2185b' };
+
   function renderMonthGrid(){
     const monthName = monthSel.value, year = Number(yearSel.value);
     const monthIndex = MONTH_NAMES.indexOf(monthName);
@@ -395,7 +400,7 @@
       const isToday = DEMO_TODAY.getFullYear() === year && DEMO_TODAY.getMonth() === monthIndex && DEMO_TODAY.getDate() === day;
       let cell = `<div class="cell${isToday ? ' today' : ''}"><span class="dnum">${day}</span>`;
       (byDay[day] || []).forEach(p => {
-        cell += `<a class="evt ${p.cls}" href="${p.href}" data-piece="${p.id}"><div class="prod">${p.prod}</div><div class="camp">${p.camp}</div><div class="time">${p.timeLabel}</div></a>`;
+        cell += `<a class="evt ${p.cls}" href="${p.href}" data-piece="${p.id}"><span class="plat-dot" style="background:${PLAT_COLORS[p.platform]||'#8b8178'}"></span><div class="prod">${p.prod}</div><div class="camp">${p.camp}</div><div class="time">${p.timeLabel}</div></a>`;
       });
       cell += '</div>';
       html += cell;
@@ -460,6 +465,15 @@
   refreshMonthPieces();
   renderMonthGrid();
   renderPiece();
+
+  // small round dot in the corner of each event marks its platform — this
+  // legend explains what those colors mean
+  (function(){
+    const el = document.getElementById('platLegend');
+    if (!el) return;
+    const platforms = CCR.getAvailablePlatforms();
+    el.innerHTML = platforms.map(p => `<span><span class="sw round" style="background:${PLAT_COLORS[p]||'#8b8178'}"></span>${p}</span>`).join('');
+  })();
 </script>
 </body>
 </html>
