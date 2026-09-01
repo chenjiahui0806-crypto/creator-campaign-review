@@ -84,6 +84,9 @@
   .perf-sub{font-size:11px;color:var(--sub);}
   .perf-val{margin-left:auto;font-size:13px;font-weight:800;}
   .perf-val.above{color:var(--above);} .perf-val.below{color:var(--below);} .perf-val.within{color:var(--within);}
+  .mini-legend{display:flex;gap:14px;margin-top:10px;}
+  .mini-legend span{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--sub);}
+  .mini-legend .sw{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
   .view-more{font-size:12px;font-weight:700;color:var(--sub);text-decoration:none;margin-top:8px;display:inline-block;}
 
   .insights{margin-top:30px;}
@@ -165,6 +168,7 @@
         <div>
           <div class="panel-head"><div class="panel-title display">Strongest pieces</div></div>
           <div class="perf-list panel-scroll" id="perfList"></div>
+          <div class="mini-legend"><span><span class="sw" style="background:var(--above)"></span>Above baseline</span><span><span class="sw" style="background:var(--below)"></span>Below baseline</span></div>
           <a class="view-more" href="page1_calendar.html">View all →</a>
         </div>
         <div class="insights" id="recent-insights" style="margin-top:0;">
@@ -292,7 +296,6 @@
           <div class="perf-val ${cls}">${(top.orderConversionRate*100).toFixed(1)}%</div>
         </div>`;
       });
-      html += '<div class="empty-note" style="margin-top:6px;">Circles mark platform. The percentage is colored green when that piece read above its own baseline, red when below.</div>';
       list.innerHTML = html || '<div class="empty-note">No pieces with funnel data yet.</div>';
       return;
     }
@@ -309,7 +312,6 @@
         <div class="perf-val ${cls}">${(p.orderConversionRate*100).toFixed(1)}%</div>
       </div>`;
     }).join('');
-    rankHtml += '<div class="empty-note" style="margin-top:6px;">Circles mark rank — 1st (gold), 2nd (silver), 3rd (bronze). The percentage is colored green when that piece read above its own baseline, red when below.</div>';
     list.innerHTML = rankHtml;
   })();
 
