@@ -246,12 +246,12 @@
     </div>
   </div>
 
-  <div class="legend">
+  <div class="legend" id="legendRow">
     <span><span class="sw" style="background:var(--above)"></span>Above your baseline</span>
     <span><span class="sw" style="background:var(--below)"></span>Below your baseline</span>
     <span><span class="sw" style="background:var(--within)"></span>Within your normal range</span>
+    <span id="platLegend" style="display:contents;"></span>
   </div>
-  <div class="legend" id="platLegend" style="margin-top:8px;"></div>
   <div class="hint">Each label shows the product and campaign. Tap any piece to open its review. Date-range filtering lives in the list view.</div>
 
 </div>
@@ -472,7 +472,8 @@
     const el = document.getElementById('platLegend');
     if (!el) return;
     const platforms = CCR.getAvailablePlatforms();
-    el.innerHTML = platforms.map(p => `<span><span class="sw round" style="background:${PLAT_COLORS[p]||'#8b8178'}"></span>${p}</span>`).join('');
+    el.innerHTML = '<span style="width:1px;height:12px;background:var(--line);"></span>' +
+      platforms.map(p => `<span><span class="sw round" style="background:${PLAT_COLORS[p]||'#8b8178'}"></span>${p}</span>`).join('');
   })();
 </script>
 </body>
