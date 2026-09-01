@@ -292,7 +292,7 @@
           <div class="perf-val ${cls}">${(top.orderConversionRate*100).toFixed(1)}%</div>
         </div>`;
       });
-      html += '<div class="empty-note" style="margin-top:6px;">Each circle\'s color and letters mark which platform that piece is on.</div>';
+      html += '<div class="empty-note" style="margin-top:6px;">Circles mark platform. The percentage is colored green when that piece read above its own baseline, red when below.</div>';
       list.innerHTML = html || '<div class="empty-note">No pieces with funnel data yet.</div>';
       return;
     }
@@ -309,7 +309,7 @@
         <div class="perf-val ${cls}">${(p.orderConversionRate*100).toFixed(1)}%</div>
       </div>`;
     }).join('');
-    rankHtml += '<div class="empty-note" style="margin-top:6px;">Circle color and number show rank within this platform — 1st (gold), 2nd (silver), 3rd (bronze).</div>';
+    rankHtml += '<div class="empty-note" style="margin-top:6px;">Circles mark rank — 1st (gold), 2nd (silver), 3rd (bronze). The percentage is colored green when that piece read above its own baseline, red when below.</div>';
     list.innerHTML = rankHtml;
   })();
 
