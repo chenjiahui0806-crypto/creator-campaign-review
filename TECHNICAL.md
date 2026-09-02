@@ -6,7 +6,7 @@ A post-publish analytics tool that tells a sponsored-content creator which stage
 
 This project originated from firsthand experience managing social media accounts and running brand deals. It exists to close a gap creators face today: there is no systematic way to analyze sponsored content performance after publishing, attribute the likely cause, and turn that into a concrete action for the next piece.
 
-**Live demo:** https://chenjiahui0806-crypto.github.io/creator-campaign-review/prototypes/
+**Live demo:** https://chenjiahui0806-crypto.github.io/creator-campaign-review/
 
 ## What this is
 
@@ -21,28 +21,34 @@ Three design constraints run through the whole product:
 ## Repository structure
 
 ```
+index.html      Redirects into the dashboard — the live-demo entry point
+page0-7_*.html  The product itself — dashboard, calendar, entry, review, insight, and reference pages
+js/engine.js    Shared client-side engine every page calls into
 /prd            Product requirements document (13 sections)
-/prototypes     Interactive HTML pages — dashboard, calendar, entry, and review pages, wired to a shared client-side engine
 /skills         AI Skill and Framework architecture for the analysis engine
 /sql            The engine's queries: schema, baseline calculation, deviation reading, R1-R7 rule evaluation, data validation
 /verification   A script that generates synthetic data and checks the R1-R7 rules actually fire the way the spec describes
 ```
+
+The product pages live at the repository root (not in a `/prototypes` subfolder) so the live demo has a clean URL.
 
 ### /prd
 `PRD.md` covers overview, goals and non-goals, user analysis, benchmarking, funnel definitions, metrics, attribution, functional modules M1–M9, dashboard specification, constraints, MVP success criteria, data model, platform metrics, and a walkthrough.
 
 Key decisions: reading window at day 2 for rate metrics, 7 fixed attribution rules (R1–R7) so every conclusion traces to a rule with a measurable hit rate, confidence tiers (High ≥12 comparable pieces, Medium 8–11, Low 2–7, None <2), gross commercial figures at P0 with refund rate deferred to P1, and single-dimension audience analysis with purchase propensity expressed in words.
 
-### /prototypes
+### The product pages
 - `index.html` — redirects into the dashboard, the live-demo entry point.
-- `page0_dashboard.html` — aggregate stats (pieces tracked, total views, total GMV), an order-conversion trend chart, a strongest-pieces list, a recent-insights feed of whatever rules have fired, and a platform breakdown — all computed live from whatever data exists in the browser.
-- `page1_calendar.html` — month and day calendar views, color-coded by order-conversion reading against baseline. The day view's prev/next arrows step through that month's pieces.
+- `page0_dashboard.html` — aggregate stats (pieces tracked, total views, total GMV), an order-conversion trend chart, a strongest-pieces list, a recent-findings feed of whatever rules have fired, and a platform dropdown — all computed live from whatever data exists in the browser.
+- `page1_calendar.html` — month and day calendar views, fully computed from real dates, color-coded by order-conversion reading against baseline. Month/year dropdowns only ever list combinations that actually have a piece.
 - `page2_detail.html` — a polished, fixed example review: diagnosis, action list, conversion funnel, stage deviation chart, commercial metrics, audience-vs-buyers comparison, opening retention curve, engagement stats, and a post-publish validation verdict. Kept static intentionally, as a reference for the intended full visual design.
 - `page3_entry.html` — the M2 content-entry form. Required identifying fields up top, optional funnel/content/commercial/audience fields grouped below. Supports two ways in: filling the form by hand, or bulk-importing a CSV/Excel file through a flexible header-matching parser with an editable preview grid. Submitting actually writes to the browser's local storage and computes a real diagnosis.
 - `page4_review.html` — the live counterpart to page2: reads a `piece` id from the URL, looks it up (seed data or anything entered through page3), and renders a real diagnosis computed by the shared engine, following the same visual layout as page2.
+- `page5_how_it_works.html` — a plain-language explanation of the diagnosis rules and confidence tiers, with real numbers computed from the browser's current data, for anyone curious how it works under the hood.
+- `page7_insight.html` — trending tags (clearly labeled as illustrative example content, not live trend data) plus content suggestions computed from the creator's own history.
 - `js/engine.js` — the shared client-side engine: local storage persistence, derived metrics, baseline percentile calculation, and the R1-R7 diagnosis logic. This is the browser-side implementation of the queries in `/sql`, and every page above calls into it rather than duplicating logic.
 
-Fifteen seed pieces ship with the engine, covering both platforms (TikTok, RedNote), both boost statuses (organic, boosted), and all seven attribution rules firing at least once, so the product tells a complete story without requiring any manual data entry first.
+Nineteen seed pieces ship with the engine, spread across six months (February–July 2026), covering three platforms (TikTok, RedNote, Instagram as a placeholder), both boost statuses (organic, boosted), and all seven attribution rules firing at least once, so the product tells a complete story without requiring any manual data entry first.
 
 ### /sql
 Six queries implementing the engine described in `/skills`: schema, comparable-set selection, baseline percentile calculation, stage deviation reading, R1-R7 rule evaluation, and pre-save data validation. See `sql/README.md` for how they chain together and which PRD section each one implements. `js/engine.js` is a faithful client-side port of this same logic, so the browser demo and the intended server-side implementation stay consistent.

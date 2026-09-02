@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Content Entry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#241d18; --sub:#8b8178; --faint:#b3a99d; --line:#e9ddd0; --hair:#f3ece2;
+    --bg:#fdf6ee; --card:#ffffff;
+    --above:#3d9668; --below:#c2483f; --within:#a89c8d; --amber:#c98a2b;
+    --above-bg:#e6f2ea; --below-bg:#f9e6e3; --within-bg:#f1ece4;
+    --self:#e8583a; --accent-soft:#fbe4da;
+    --frame-bg:#f0c39e; --sidebar-bg:#faf3ea;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html, body{height:100%;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#fdf6ee;color:var(--ink);line-height:1.4;overflow:hidden;}
+  .display{font-family:"Fraunces",Georgia,serif;font-weight:700;letter-spacing:-.015em;}
+
+  .frame{padding:34px;height:100vh;}
+  .shell{max-width:1400px;margin:0 auto;background:var(--frame-bg);border-radius:28px;padding:14px;display:flex;gap:14px;height:100%;overflow:hidden;}
+  .sidebar{width:220px;flex-shrink:0;background:var(--sidebar-bg);border-radius:20px;padding:26px 20px;display:flex;flex-direction:column;height:100%;overflow-y:auto;}
+  .sb-brand{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;}
+  .sb-brand .dot{width:9px;height:9px;border-radius:50%;background:var(--self);display:inline-block;}
+  .sb-profile{margin-top:32px;}
+  .sb-cta{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;padding:13px;border-radius:14px;background:var(--self);color:#fff;font-size:14px;font-weight:800;text-decoration:none;box-shadow:0 4px 10px -3px rgba(232,88,58,.45);}
+  .sb-cta:hover{filter:brightness(1.05);}
+  .sb-cta .plus{font-size:17px;line-height:1;}
+  .sb-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--self),#f4a06f);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;}
+  .sb-name{font-size:14px;font-weight:800;margin-top:10px;}
+  .sb-role{font-size:11px;color:var(--sub);margin-top:1px;}
+  .sb-nav{margin-top:26px;display:flex;flex-direction:column;gap:4px;}
+  .sb-nav a{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-nav a .ic{width:16px;text-align:center;}
+  .sb-nav a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-nav a.active .ic{color:var(--self);}
+  .sb-dropdown a{font-size:12px;font-weight:600;color:var(--faint);text-decoration:none;padding:7px 10px;border-radius:8px;}
+  .sb-dropdown a:hover{background:var(--hair);color:var(--sub);}
+
+  .sb-foot-group{margin-top:auto;display:flex;flex-direction:column;gap:2px;}
+  .sb-foot-group a{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--faint);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-foot-group a:hover{background:var(--hair);color:var(--sub);}
+  .sb-foot-group a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .maincard{flex:1;background:var(--card);border-radius:20px;padding:30px 34px 36px;height:100%;overflow-y:auto;}
+  .page{background:var(--card);min-height:auto;padding:0;}
+
+  /* header, matches calendar + detail pages */
+  .top{padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .top-row{display:flex;justify-content:space-between;align-items:flex-end;}
+  .brand{font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.01em;}
+  .h1-line{display:flex;align-items:center;gap:14px;margin-top:4px;}
+  .h1{font-size:22px;font-weight:800;letter-spacing:-.01em;}
+  .h-sub{font-size:12px;color:var(--sub);margin-top:3px;}
+  .back{font-size:12px;font-weight:600;color:var(--sub);text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+  .back:hover{color:var(--self);}
+
+  .demo-note{margin-top:16px;padding:10px 14px;border:1px solid var(--line);border-radius:9px;background:#f7f8fa;font-size:11px;color:var(--sub);}
+  .demo-note b{color:var(--ink);}
+
+  /* layout: two columns, form left, summary rail right */
+  .layout{display:grid;grid-template-columns:1fr 300px;gap:28px;margin-top:22px;align-items:start;}
+
+  .section{border:1px solid var(--line);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+  .section-head{padding:14px 18px;background:#fafbfc;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;}
+  .section-head .st{display:flex;flex-direction:column;gap:2px;}
+  .section-head .name{font-size:14px;font-weight:800;}
+  .section-head .desc{font-size:11px;color:var(--sub);}
+  .req-flag{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--below-bg);color:var(--below);}
+  .opt-flag{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--within-bg);color:var(--within);}
+  .section-body{padding:16px 18px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-size:11px;font-weight:700;color:var(--sub);}
+  .field .hint{font-size:10px;color:var(--faint);margin-top:-2px;}
+  .field input, .field select{
+    font:inherit;font-size:13px;color:var(--ink);background:#fff;border:1px solid var(--line);
+    border-radius:8px;padding:9px 11px;width:100%;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--self);}
+  .field input::placeholder{color:var(--faint);}
+  .toggle-row{display:flex;gap:10px;}
+  .toggle-row label{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:700;
+    padding:9px 0;border:1px solid var(--line);border-radius:8px;cursor:pointer;color:var(--sub);
+  }
+  .toggle-row input{display:none;}
+  .toggle-row input:checked + span{color:var(--self);}
+  .toggle-row label:has(input:checked){border-color:var(--self);background:var(--accent-soft);}
+
+  .field-note{margin-top:10px;font-size:10px;color:var(--faint);}
+
+  /* summary rail */
+  .rail{position:sticky;top:20px;border:1px solid var(--line);border-radius:12px;padding:18px;background:#fafbfc;}
+  .rail h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--sub);margin-bottom:12px;}
+  .rail-row{display:flex;justify-content:space-between;font-size:12px;padding:7px 0;border-top:1px solid var(--hair);}
+  .rail-row:first-of-type{border-top:none;}
+  .rail-row .k{color:var(--sub);}
+  .rail-row .v{font-weight:700;color:var(--ink);}
+  .rail-foot{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:10px;color:var(--faint);line-height:1.5;}
+  .save-btn{width:100%;margin-top:18px;padding:12px;border:none;border-radius:9px;background:var(--self);color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+  .save-btn:hover{filter:brightness(1.05);}
+  .save-msg{display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--within-bg);color:var(--ink);font-size:11px;line-height:1.5;}
+  .save-msg.show{display:block;}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sb-brand"><span class="dot"></span>Campaign Review</div>
+      <div class="sb-profile">
+        <div class="sb-avatar">CJ</div>
+        <div class="sb-name">Creator Account</div>
+        <div class="sb-role">TikTok · Sponsored content</div>
+      </div>
+      <a class="sb-cta" style="filter:brightness(0.92);" href="page3_entry.html"><span class="plus">+</span>New Content</a>
+      <nav class="sb-nav">
+        <a href="page0_dashboard.html"><span class="ic">▦</span>Dashboard</a>
+        <a href="page1_calendar.html"><span class="ic">▤</span>Calendar</a>
+      <a href="page7_insight.html"><span class="ic">✦</span>Insight</a>
+      </nav>
+      <div class="sb-foot-group">
+        <a href="page5_how_it_works.html"><span>⚙</span>How it works</a>
+        <a href="#"><span>⚙</span>Settings</a>
+        <a href="#"><span>⏻</span>Log out</a>
+      </div>
+    </aside>
+    <main class="maincard">
+<div class="page">
+
+  <div class="top">
+    <div class="top-row">
+      <div>
+        <div class="brand">Campaign Content Review</div>
+        <div class="h1-line">
+          <div class="h1 display">New Content Entry</div>
+        </div>
+        <div class="h-sub">Enter one published piece. Only platform, product, publish time, format, and boost status are required — everything else can be filled in later.</div>
+      </div>
+      <a class="back" href="page1_calendar.html">‹ Back to calendar</a>
+    </div>
+  </div>
+
+  <div class="demo-note"><b>Working demo, browser-only.</b> "Save piece" writes to this browser's local storage and computes a real diagnosis using the R1-R7 rules — nothing is sent to a server, and nobody else can see it. Clear your browser data and it's gone. The grid on the calendar page only renders July 2026, so a piece published outside that month won't appear there visually, but it still counts toward the baseline.</div>
+
+  <div class="section" style="margin-top:16px;">
+    <div class="section-head">
+      <div class="st">
+        <div class="name">Bulk import from spreadsheet</div>
+        <div class="desc">Upload a CSV or Excel file to add several pieces at once instead of filling the form below one at a time.</div>
+      </div>
+      <span class="opt-flag">Optional</span>
+    </div>
+    <div class="section-body">
+      <div class="hint" style="margin-bottom:10px;">
+        Upload a spreadsheet — messy headers are fine, fix anything missing right in the table below.
+      </div>
+      <input type="file" id="f-bulkfile" accept=".csv,.xlsx,.xls" style="font-size:12px;">
+      <button class="save-btn" id="parseBtn" style="width:auto;padding:9px 18px;margin:0 0 0 10px;display:inline-block;">Parse file</button>
+      <div id="bulkPreview" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div class="section-head" style="margin-top:22px;border:none;padding:0;">
+    <div class="st"><div class="name display" style="font-size:18px;">Or add one piece manually</div></div>
+  </div>
+
+  <div class="layout">
+    <div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="st">
+            <div class="name">Identifying info</div>
+            <div class="desc">A piece cannot be saved without these five fields.</div>
+          </div>
+          <span class="req-flag">Required</span>
+        </div>
+        <div class="section-body">
+          <div class="grid2">
+            <div class="field">
+              <label>Platform</label>
+              <select id="f-platform"><option>TikTok</option><option>RedNote</option><option>Instagram</option><option>Other</option></select>
+            </div>
+            <div class="field">
+              <label>Product</label>
+              <select id="f-product"><option>Nut Brand</option><option>Drink Brand</option><option>Air Fryer Brand</option><option>Sheet-Mask Brand</option></select>
+            </div>
+            <div class="field">
+              <label>Campaign name</label>
+              <input type="text" id="f-campaign" placeholder="e.g. Late-Summer Snack List">
+            </div>
+            <div class="field">
+              <label>Published at</label>
+              <input type="datetime-local" id="f-published" value="2026-07-15T19:30">
+            </div>
+          </div>
+          <div class="field" style="margin-top:14px;">
+            <label>Content format</label>
+            <div class="toggle-row" style="max-width:300px;">
+              <label><input type="radio" name="fmt" value="unboxing" checked><span>Unboxing</span></label>
+              <label><input type="radio" name="fmt" value="daily_share"><span>Daily share</span></label>
+            </div>
+            <div class="hint">This is the narrative style, not the media type — every piece here is video.</div>
+          </div>
+          <div class="field" style="margin-top:14px;">
+            <label>Boost status</label>
+            <div class="toggle-row" style="max-width:300px;">
+              <label><input type="radio" name="boost" value="organic" checked><span>Organic</span></label>
+              <label><input type="radio" name="boost" value="boosted"><span>Boosted</span></label>
+            </div>
+            <div class="hint">Boosted pieces never share a baseline with organic ones — impressions on a boosted piece weren't earned by the content.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="st">
+            <div class="name">Funnel</div>
+            <div class="desc">Impressions through orders. Missing a field only disables the rules that depend on it.</div>
+          </div>
+          <span class="opt-flag">Optional</span>
+        </div>
+        <div class="section-body">
+          <div class="grid3">
+            <div class="field"><label>Impressions</label><input type="number" id="f-impressions" placeholder="e.g. 15000"></div>
+            <div class="field"><label>Views</label><input type="number" id="f-views" placeholder="e.g. 9800"></div>
+            <div class="field"><label>Store visits</label><input type="number" id="f-storevisits" placeholder="e.g. 1400"></div>
+            <div class="field"><label>Clicks</label><input type="number" id="f-clicks" placeholder="e.g. 900"></div>
+            <div class="field"><label>Orders</label><input type="number" id="f-orders" placeholder="e.g. 270"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="st">
+            <div class="name">Content</div>
+            <div class="desc">Retention and engagement, read at day two.</div>
+          </div>
+          <span class="opt-flag">Optional</span>
+        </div>
+        <div class="section-body">
+          <div class="grid3">
+            <div class="field"><label>3s completion %</label><input type="number" id="f-completion3s" placeholder="e.g. 58"></div>
+            <div class="field"><label>Avg watch time (s)</label><input type="number" id="f-watchtime" placeholder="e.g. 11.2"></div>
+            <div class="field"><label>Completion rate %</label><input type="number" id="f-completionrate" placeholder="e.g. 33"></div>
+            <div class="field"><label>Saves</label><input type="number" id="f-saves" placeholder="e.g. 120"></div>
+            <div class="field"><label>Shares</label><input type="number" id="f-shares" placeholder="e.g. 45"></div>
+            <div class="field"><label>Comments</label><input type="number" id="f-comments" placeholder="e.g. 60"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="st">
+            <div class="name">Commercial</div>
+            <div class="desc">Gross figures only at P0 — refund data isn't available at the day-two reading age.</div>
+          </div>
+          <span class="opt-flag">Optional</span>
+        </div>
+        <div class="section-body">
+          <div class="grid3">
+            <div class="field"><label>GMV ($)</label><input type="number" id="f-gmv" placeholder="e.g. 11500"></div>
+            <div class="field"><label>Unit price ($)</label><input type="number" id="f-unitprice" placeholder="e.g. 68"></div>
+            <div class="field"><label>Discount %</label><input type="number" id="f-discount" placeholder="e.g. 10"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="st">
+            <div class="name">Audience</div>
+            <div class="desc">Gender split only, single dimension — crossed segments aren't available from platform dashboards.</div>
+          </div>
+          <span class="opt-flag">Optional</span>
+        </div>
+        <div class="section-body">
+          <div class="grid2">
+            <div class="field"><label>Viewers — % female</label><input type="number" id="f-viewerfemale" placeholder="e.g. 68"></div>
+            <div class="field"><label>Buyers — % female</label><input type="number" id="f-buyerfemale" placeholder="e.g. 85"></div>
+          </div>
+          <div class="field-note">Fewer than 50 orders on this piece will mark all audience readings low-confidence, per the PRD's benchmarking rules.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="rail">
+      <h3>Before you save</h3>
+      <div class="rail-row"><span class="k">Required fields</span><span class="v" id="rail-required">5 / 5</span></div>
+      <div class="rail-row"><span class="k">Optional fields filled</span><span class="v" id="rail-optional">0 / 17</span></div>
+      <div class="rail-row"><span class="k">Comparable baseline</span><span class="v" id="rail-baseline">7 pieces</span></div>
+      <div class="rail-row"><span class="k">Confidence if saved</span><span class="v" id="rail-confidence">Low</span></div>
+      <button class="save-btn" id="saveBtn">Save piece</button>
+      <div class="save-msg" id="saveMsg">Saved. Redirecting to its review…</div>
+      <div class="rail-foot">Reading age is measured from the publish time above. Retention and completion finalize within 24 hours; conversion rates stabilize enough to read around day two.</div>
+    </div>
+  </div>
+
+</div>
+</main>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/engine.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+
+  function updateRail(){
+    const required = [$('f-platform').value, $('f-product').value, $('f-published').value].every(v => v);
+    $('rail-required').textContent = required ? '5 / 5' : '4 / 5';
+
+    const optionalIds = ['f-impressions','f-views','f-storevisits','f-clicks','f-orders',
+      'f-completion3s','f-watchtime','f-completionrate','f-saves','f-shares','f-comments',
+      'f-gmv','f-unitprice','f-discount','f-viewerfemale','f-buyerfemale'];
+    const filled = optionalIds.filter(id => $(id).value !== '').length;
+    $('rail-optional').textContent = `${filled} / ${optionalIds.length}`;
+
+    const platform = $('f-platform').value;
+    const boost = document.querySelector('input[name="boost"]:checked').value;
+    const comparable = CCR.getAllPieces().filter(p => p.platform === platform && p.boost === boost);
+    $('rail-baseline').textContent = `${comparable.length} pieces`;
+    const conf = CCR.confidenceLabel(comparable.length);
+    $('rail-confidence').textContent = conf.charAt(0).toUpperCase() + conf.slice(1);
+  }
+  document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', updateRail));
+  updateRail();
+
+  function num(id){ const v = $(id).value; return v === '' ? null : Number(v); }
+
+  // ---------------------------------------------------------------------
+  // Bulk import
+  // ---------------------------------------------------------------------
+  const REQUIRED_COLS = ['platform', 'product', 'campaign', 'publishedAt', 'format'];
+  const COLUMN_DEFS = [
+    { key: 'platform', label: 'Platform', required: true, type: 'text' },
+    { key: 'product', label: 'Product', required: true, type: 'text' },
+    { key: 'campaign', label: 'Campaign', required: true, type: 'text' },
+    { key: 'publishedAt', label: 'Published at', required: true, type: 'datetime' },
+    { key: 'format', label: 'Format', required: true, type: 'text' },
+    { key: 'boost', label: 'Boost', required: false, type: 'text' },
+    { key: 'impressions', label: 'Impressions', required: false, type: 'number' },
+    { key: 'views', label: 'Views', required: false, type: 'number' },
+    { key: 'storeVisits', label: 'Store visits', required: false, type: 'number' },
+    { key: 'clicks', label: 'Clicks', required: false, type: 'number' },
+    { key: 'orders', label: 'Orders', required: false, type: 'number' },
+    { key: 'completion3s', label: '3s completion %', required: false, type: 'number' },
+    { key: 'avgWatchTime', label: 'Avg watch (s)', required: false, type: 'number' },
+    { key: 'completionRate', label: 'Completion %', required: false, type: 'number' },
+    { key: 'saves', label: 'Saves', required: false, type: 'number' },
+    { key: 'shares', label: 'Shares', required: false, type: 'number' },
+    { key: 'comments', label: 'Comments', required: false, type: 'number' },
+    { key: 'gmv', label: 'GMV', required: false, type: 'number' },
+    { key: 'unitPrice', label: 'Unit price', required: false, type: 'number' },
+    { key: 'discount', label: 'Discount %', required: false, type: 'number' },
+    { key: 'viewerFemale', label: 'Viewer % F', required: false, type: 'number' },
+    { key: 'buyerFemale', label: 'Buyer % F', required: false, type: 'number' },
+  ];
+
+  // Accepts near-enough header spellings: case/space/underscore/punctuation
+  // insensitive, plus a few common synonyms, so a file doesn't have to match
+  // the template character-for-character to be recognized.
+  const HEADER_ALIASES = {
+    platform: ['platform'],
+    product: ['product', 'productname', 'brand'],
+    campaign: ['campaign', 'campaignname', 'title', 'contenttitle'],
+    publishedAt: ['publishedat', 'published', 'publishdate', 'date', 'publishtime'],
+    format: ['format', 'contentformat', 'type'],
+    boost: ['boost', 'booststatus', 'boosted'],
+    impressions: ['impressions', 'impression'],
+    views: ['views', 'view'],
+    storeVisits: ['storevisits', 'storevisit', 'visits'],
+    clicks: ['clicks', 'click'],
+    orders: ['orders', 'order'],
+    completion3s: ['completion3s', '3scompletion', 'completion3'],
+    avgWatchTime: ['avgwatchtime', 'averagewatchtime', 'watchtime'],
+    completionRate: ['completionrate', 'completion'],
+    saves: ['saves', 'save'],
+    shares: ['shares', 'share'],
+    comments: ['comments', 'comment'],
+    gmv: ['gmv', 'revenue'],
+    unitPrice: ['unitprice', 'price'],
+    discount: ['discount'],
+    viewerFemale: ['viewerfemale', 'viewersfemale', 'viewerpercentfemale'],
+    buyerFemale: ['buyerfemale', 'buyersfemale', 'buyerpercentfemale'],
+  };
+
+  function normalizeHeader(h){
+    return String(h).toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  function buildHeaderMap(headers){
+    const map = {}; // raw header -> canonical key
+    headers.forEach(h => {
+      const norm = normalizeHeader(h);
+      const match = Object.entries(HEADER_ALIASES).find(([key, aliases]) => aliases.includes(norm));
+      if (match) map[h] = match[0];
+    });
+    return map;
+  }
+
+  function rowFromRaw(raw, headerMap){
+    const row = {};
+    Object.entries(raw).forEach(([h, v]) => {
+      const key = headerMap[h];
+      if (key) row[key] = String(v ?? '').trim();
+    });
+    return row;
+  }
+
+  let gridRows = []; // array of { key: value } piece-shaped objects, editable
+
+  function toPiece(row, idx){
+    const dateVal = row.publishedAt;
+    const dateOk = dateVal && !isNaN(new Date(dateVal.replace(' ', 'T')).getTime());
+    const piece = { id: 'import-' + Date.now() + '-' + idx };
+    COLUMN_DEFS.forEach(c => {
+      let v = row[c.key];
+      if (v === undefined || v === '') { piece[c.key] = c.key === 'format' ? 'unboxing' : c.key === 'boost' ? 'organic' : null; return; }
+      if (c.type === 'number') piece[c.key] = isNaN(Number(v)) ? null : Number(v);
+      else if (c.key === 'publishedAt') piece[c.key] = dateOk ? v.replace(' ', 'T').slice(0,16) : v;
+      else if (c.key === 'format') piece[c.key] = v.trim() === 'daily_share' ? 'daily_share' : 'unboxing';
+      else if (c.key === 'boost') piece[c.key] = v.trim() === 'boosted' ? 'boosted' : 'organic';
+      else piece[c.key] = v;
+    });
+    return piece;
+  }
+
+  function rowIsValid(piece){
+    return REQUIRED_COLS.every(k => piece[k] !== null && piece[k] !== '' && piece[k] !== undefined)
+      && !isNaN(new Date(String(piece.publishedAt).replace(' ','T')).getTime());
+  }
+
+  $('parseBtn').onclick = () => {
+    const file = $('f-bulkfile').files[0];
+    if (!file){ alert('Choose a CSV or Excel file first.'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
+      if (!rawRows.length){ $('bulkPreview').innerHTML = '<div style="font-size:12px;color:var(--faint);">No rows found in that file.</div>'; return; }
+      const headerMap = buildHeaderMap(Object.keys(rawRows[0]));
+      gridRows = rawRows.map((raw, i) => toPiece(rowFromRaw(raw, headerMap), i));
+      renderGrid();
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  function renderGrid(){
+    const validCount = gridRows.filter(rowIsValid).length;
+    let html = `<div style="font-size:12px;margin-bottom:10px;">Recognized ${gridRows.length} row${gridRows.length>1?'s':''}. <b>${validCount}</b> ready to import — edit any cell below to fill in what wasn't recognized, columns in bold are required.</div>`;
+    html += '<div style="max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:8px;">';
+    html += '<table style="border-collapse:collapse;font-size:11px;white-space:nowrap;">';
+    html += '<tr style="background:#fafbfc;position:sticky;top:0;"><th style="padding:6px 8px;text-align:left;">#</th>';
+    COLUMN_DEFS.forEach(c => { html += `<th style="padding:6px 8px;text-align:left;${c.required?'font-weight:800;':'font-weight:400;color:var(--faint);'}">${c.label}</th>`; });
+    html += '<th style="padding:6px 8px;">Status</th></tr>';
+    gridRows.forEach((piece, i) => {
+      const ok = rowIsValid(piece);
+      html += `<tr style="border-top:1px solid var(--hair);" data-row="${i}">`;
+      html += `<td style="padding:4px 8px;color:var(--faint);">${i+1}</td>`;
+      COLUMN_DEFS.forEach(c => {
+        const val = piece[c.key] == null ? '' : piece[c.key];
+        html += `<td style="padding:2px 4px;"><input data-row="${i}" data-key="${c.key}" value="${String(val).replace(/"/g,'&quot;')}" style="width:${c.type==='datetime'?'130px':c.key==='campaign'||c.key==='product'?'130px':'70px'};font-size:11px;padding:4px 6px;border:1px solid var(--line);border-radius:5px;"></td>`;
+      });
+      html += `<td style="padding:4px 8px;" data-status="${i}">${ok ? '<span style="color:var(--above);font-weight:700;">Ready</span>' : '<span style="color:var(--below);font-weight:700;">Incomplete</span>'}</td>`;
+      html += '</tr>';
+    });
+    html += '</table></div>';
+    html += `<button class="save-btn" id="importBtn" style="width:auto;padding:9px 18px;margin-top:12px;">Import ready rows</button>`;
+    $('bulkPreview').innerHTML = html;
+
+    $('bulkPreview').querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const r = Number(inp.dataset.row), k = inp.dataset.key;
+        const def = COLUMN_DEFS.find(c => c.key === k);
+        gridRows[r][k] = def.type === 'number' ? (inp.value === '' ? null : Number(inp.value)) : inp.value;
+        const ok = rowIsValid(gridRows[r]);
+        document.querySelector(`[data-status="${r}"]`).innerHTML = ok
+          ? '<span style="color:var(--above);font-weight:700;">Ready</span>'
+          : '<span style="color:var(--below);font-weight:700;">Incomplete</span>';
+      });
+    });
+
+    $('importBtn').onclick = () => {
+      const ready = gridRows.filter(rowIsValid);
+      if (!ready.length){ alert('No rows are ready yet — fill in the required columns first.'); return; }
+      ready.forEach(p => CCR.saveUserPiece(p));
+      alert(`Imported ${ready.length} piece${ready.length>1?'s':''}. Taking you to the calendar.`);
+      location.href = 'page1_calendar.html';
+    };
+  }
+
+  $('saveBtn').onclick = () => {
+    const platform = $('f-platform').value;
+    const product = $('f-product').value;
+    const campaign = $('f-campaign').value || 'Untitled piece';
+    const published = $('f-published').value;
+    if (!platform || !product || !published){
+      alert('Platform, product, and published date are required.');
+      return;
+    }
+    const format = document.querySelector('input[name="fmt"]:checked').value;
+    const boost = document.querySelector('input[name="boost"]:checked').value;
+
+    const id = 'user-' + Date.now();
+    const piece = {
+      id, platform, product, campaign,
+      publishedAt: published, format, boost,
+      impressions: num('f-impressions'), views: num('f-views'),
+      storeVisits: num('f-storevisits'), clicks: num('f-clicks'), orders: num('f-orders'),
+      completion3s: num('f-completion3s'), completionRate: num('f-completionrate'),
+      avgWatchTime: num('f-watchtime'), saves: num('f-saves'), shares: num('f-shares'), comments: num('f-comments'),
+      gmv: num('f-gmv'), unitPrice: num('f-unitprice'), discount: num('f-discount'),
+      viewerFemale: num('f-viewerfemale'), buyerFemale: num('f-buyerfemale'),
+    };
+    CCR.saveUserPiece(piece);
+    $('saveMsg').classList.add('show');
+    setTimeout(() => { location.href = 'page4_review.html?piece=' + id; }, 700);
+  };
+</script>
+</body>
+</html>

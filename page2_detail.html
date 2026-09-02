@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Review Detail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#241d18; --sub:#8b8178; --faint:#b3a99d; --line:#e9ddd0; --hair:#f3ece2;
+    --bg:#fdf6ee; --card:#ffffff; --panel:#ffffff;
+    --above:#3d9668; --below:#c2483f; --within:#a89c8d; --amber:#c98a2b;
+    --above-bg:#e6f2ea; --below-bg:#f9e6e3; --within-bg:#f1ece4; --amber-bg:#fbf1df;
+    --self:#e8583a; --base:#d9cdbe; --accent-soft:#fbe4da;
+    --frame-bg:#f0c39e; --sidebar-bg:#faf3ea;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html, body{height:100%;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#fdf6ee;color:var(--ink);line-height:1.45;overflow:hidden;}
+  .display{font-family:"Fraunces",Georgia,serif;font-weight:700;letter-spacing:-.015em;}
+
+  .frame{padding:34px;height:100vh;}
+  .shell{max-width:1400px;margin:0 auto;background:var(--frame-bg);border-radius:28px;padding:14px;display:flex;gap:14px;height:100%;overflow:hidden;}
+  .sidebar{width:220px;flex-shrink:0;background:var(--sidebar-bg);border-radius:20px;padding:26px 20px;display:flex;flex-direction:column;height:100%;overflow-y:auto;}
+  .sb-brand{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;}
+  .sb-brand .dot{width:9px;height:9px;border-radius:50%;background:var(--self);display:inline-block;}
+  .sb-profile{margin-top:32px;}
+  .sb-cta{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;padding:13px;border-radius:14px;background:var(--self);color:#fff;font-size:14px;font-weight:800;text-decoration:none;box-shadow:0 4px 10px -3px rgba(232,88,58,.45);}
+  .sb-cta:hover{filter:brightness(1.05);}
+  .sb-cta .plus{font-size:17px;line-height:1;}
+  .sb-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--self),#f4a06f);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;}
+  .sb-name{font-size:14px;font-weight:800;margin-top:10px;}
+  .sb-role{font-size:11px;color:var(--sub);margin-top:1px;}
+  .sb-nav{margin-top:26px;display:flex;flex-direction:column;gap:4px;}
+  .sb-nav a{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-nav a .ic{width:16px;text-align:center;}
+  .sb-nav a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-nav a.active .ic{color:var(--self);}
+  .sb-dropdown a{font-size:12px;font-weight:600;color:var(--faint);text-decoration:none;padding:7px 10px;border-radius:8px;}
+  .sb-dropdown a:hover{background:var(--hair);color:var(--sub);}
+
+  .sb-foot-group{margin-top:auto;display:flex;flex-direction:column;gap:2px;}
+  .sb-foot-group a{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--faint);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-foot-group a:hover{background:var(--hair);color:var(--sub);}
+  .sb-foot-group a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .maincard{flex:1;background:var(--card);border-radius:20px;padding:30px 34px 36px;height:100%;overflow-y:auto;}
+  .page{width:100%;margin:0;background:var(--card);min-height:auto;padding:0;}
+
+  /* back + header */
+  .back{font-size:12px;color:var(--self);font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-bottom:12px;}
+  .crumb{font-size:11px;color:var(--sub);}
+  .crumb b{color:var(--ink);}
+  .head-row{display:flex;justify-content:space-between;align-items:flex-start;margin-top:4px;padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .h-title{font-size:19px;font-weight:800;letter-spacing:-.01em;}
+  .h-sub{font-size:12px;color:var(--sub);margin-top:3px;}
+  .conf-pill{font-size:11px;font-weight:700;padding:5px 13px;border-radius:14px;background:var(--within-bg);color:var(--sub);white-space:nowrap;}
+  .head-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px;}
+  .htag{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;display:inline-flex;align-items:center;gap:5px;}
+  .htag::before{content:"";width:6px;height:6px;border-radius:50%;}
+  .htag.boost{background:#fdeee0;color:#b5741a;}
+  .htag.boost::before{background:#c07a1e;}
+  .htag.window{background:var(--within-bg);color:var(--sub);}
+  .htag.window::before{background:var(--faint);}
+
+  /* DIAGNOSIS */
+  .diagnosis{margin-top:18px;border:1.5px solid #dee3ef;border-radius:16px;padding:22px 24px;background:#ffffff;}
+  .diag-eyebrow{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--self);}
+  .diag-stage{font-size:24px;font-weight:800;margin-top:7px;letter-spacing:-.015em;}
+  .diag-stage .badge{font-size:12px;font-weight:700;color:var(--below);background:var(--below-bg);padding:3px 10px;border-radius:8px;vertical-align:middle;margin-left:9px;}
+  .diag-lead{font-size:13px;color:var(--sub);margin-top:8px;}
+  .diag-cols{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px;}
+  .diag-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:15px 17px;}
+  .dc-tag{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:5px;display:inline-block;margin-bottom:9px;}
+  .dc-tag.content{background:#eef1ff;color:var(--self);}
+  .dc-tag.commercial{background:#fdeee0;color:#c07a1e;}
+  .dc-factor{font-size:14px;font-weight:700;line-height:1.35;}
+  .dc-evi{font-size:12px;color:var(--sub);margin-top:7px;line-height:1.5;}
+  .dc-evi b{color:var(--below);font-weight:700;}
+  .dc-mini{font-size:11px;color:var(--faint);margin-top:10px;padding-top:10px;border-top:1px solid var(--hair);line-height:1.5;}
+  .diag-next{margin-top:16px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--above);border-radius:9px;padding:14px 17px;}
+  .dn-tag{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--above);}
+  .dn-text{font-size:14px;font-weight:600;margin-top:5px;}
+
+  /* section heading */
+  .sec-h{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);margin:26px 0 12px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+  .panel{border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+  .panel.full{grid-column:1/-1;}
+  .p-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;}
+  .p-title{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);}
+  .p-note{font-size:10px;color:var(--faint);}
+  .p-hint{font-size:11px;color:var(--faint);margin-bottom:13px;}
+
+  /* funnel */
+  .f-stage{margin-bottom:11px;}
+  .f-row{display:flex;align-items:center;gap:12px;}
+  .f-lbl{width:150px;font-size:12px;font-weight:600;color:var(--ink);flex-shrink:0;display:flex;flex-direction:column;gap:2px;}
+  .f-lbl .f-def{font-size:9px;font-weight:400;color:var(--faint);line-height:1.25;}
+  .f-track{flex:1;background:var(--hair);border-radius:6px;height:30px;overflow:hidden;}
+  .f-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:12px;color:#fff;font-size:12px;font-weight:700;}
+  .f-meta{width:130px;flex-shrink:0;text-align:right;font-size:12px;display:flex;align-items:center;justify-content:flex-end;gap:6px;}
+  .f-meta .rate{font-weight:700;}
+  .f-calc{font-size:9px;color:var(--faint);margin-top:4px;padding-left:162px;}
+  .tag{display:inline-block;font-size:10px;font-weight:800;padding:1px 7px;border-radius:4px;margin-left:6px;}
+  .tag.above{background:var(--above-bg);color:var(--above);}
+  .tag.below{background:var(--below-bg);color:var(--below);}
+  .tag.within{background:var(--within-bg);color:var(--within);}
+  .tag.info{background:#eef0f3;color:var(--faint);}
+
+  /* deviation diverging bars */
+  .dev-panel{display:flex;flex-direction:column;height:100%;}
+  .dev-chart{display:flex;flex-direction:column;justify-content:space-around;flex:1;padding:14px 0;}
+  .dev-row{display:flex;align-items:center;gap:10px;font-size:12px;}
+  .dev-name{width:92px;color:var(--sub);flex-shrink:0;text-align:right;}
+  .dev-track{flex:1;height:30px;position:relative;}
+  .dev-track::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line);}
+  .dev-bar{position:absolute;top:5px;height:20px;border-radius:4px;}
+  .dev-bar.pos{left:50%;}
+  .dev-bar.neg{right:50%;}
+  .dev-lbl{position:absolute;top:5px;height:20px;display:flex;align-items:center;font-size:11px;font-weight:700;}
+  .dev-lbl.pos{left:50%;}
+  .dev-lbl.neg{right:50%;justify-content:flex-end;}
+  .dev-val{width:46px;font-size:11px;font-weight:700;flex-shrink:0;}
+  .dev-axis{display:flex;justify-content:space-between;font-size:9px;color:var(--faint);margin-top:6px;padding:0 92px 0 102px;}
+
+  /* commercial stats */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:11px 13px;}
+  .stat .k{font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.03em;}
+  .stat .v{font-size:18px;font-weight:800;margin-top:3px;display:flex;align-items:center;gap:6px;}
+  .stat .sub{font-size:9px;color:var(--faint);margin-top:2px;}
+  .stat .dev{font-size:12px;font-weight:800;margin-top:4px;}
+  .stat .dev.above{color:var(--above);}
+  .stat .dev.below{color:var(--below);}
+  .stat .dev.within{color:var(--within);}
+
+  /* audience */
+  .aud-row{margin-bottom:14px;}
+  .aud-lbl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;}
+  .aud-lbl .who{font-weight:600;}
+  .aud-lbl .prop{font-weight:700;}
+  .aud-bars{display:flex;flex-direction:column;gap:4px;}
+  .aud-bar{height:16px;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:#fff;}
+  .aud-key{font-size:11px;color:var(--sub);margin-top:4px;line-height:1.5;}
+
+  /* retention */
+  .legend{display:flex;gap:15px;font-size:11px;color:var(--sub);margin-bottom:8px;}
+  .legend i{display:inline-block;width:16px;height:2px;vertical-align:middle;margin-right:5px;}
+  .legend .s i{background:var(--self);} .legend .b i{background:var(--base);}
+
+  /* validation */
+  .val-row{display:flex;align-items:center;gap:13px;margin-bottom:10px;font-size:13px;}
+  .val-name{width:170px;color:var(--sub);flex-shrink:0;}
+  .val-old{font-weight:700;color:var(--faint);}
+  .val-new{font-weight:700;color:var(--above);}
+  .val-arrow{color:var(--above);}
+  .adopt{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);}
+  .adopt-q{font-size:12px;color:var(--sub);margin-bottom:10px;}
+  .adopt-btns{display:flex;gap:9px;}
+  .adopt-btns button{font:inherit;font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;}
+  .adopt-btns button.yes{background:#eef1ff;border-color:#d3d9f7;color:var(--self);}
+
+  /* action checklist (shared with calendar day view) */
+  .todo-title{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--sub);margin-bottom:12px;}
+  .todo{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-top:1px solid var(--hair);cursor:pointer;}
+  .todo:first-of-type{border-top:none;}
+  .todo .box{width:22px;height:22px;border:2px solid var(--line);border-radius:6px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;transition:all .12s;}
+  .todo.done .box{background:var(--above);border-color:var(--above);}
+  .todo .txt{font-size:13px;line-height:1.5;}
+  .todo .txt .side{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:1px 6px;border-radius:4px;margin-right:8px;vertical-align:middle;}
+  .todo .txt .side.content{background:#eef1ff;color:var(--self);}
+  .todo .txt .side.commercial{background:#fdeee0;color:#c07a1e;}
+  .todo .txt b{color:var(--below);}
+  .todo.done .txt{color:var(--faint);text-decoration:line-through;}
+  .todo.done .txt .side{opacity:.5;}
+
+  /* verdict block */
+  .verdict{margin-top:15px;border-radius:10px;padding:14px 16px;background:var(--above-bg);border:1px solid #cbe7d6;}
+  .verdict.pending{background:var(--amber-bg);border-color:#eddcb8;}
+  .verdict .vh{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--above);margin-bottom:5px;}
+  .verdict.pending .vh{color:var(--amber);}
+  .verdict .vt{font-size:13px;line-height:1.5;}
+  .verdict .vt b{font-weight:700;}
+
+  /* color legend */
+  .colorlegend{display:flex;flex-wrap:wrap;gap:16px;margin-top:22px;padding:13px 18px;background:var(--panel);border:1px solid var(--line);border-radius:11px;font-size:11px;color:var(--sub);}
+  .colorlegend span{display:flex;align-items:center;gap:6px;}
+  .sw{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sb-brand"><span class="dot"></span>Campaign Review</div>
+      <div class="sb-profile">
+        <div class="sb-avatar">CJ</div>
+        <div class="sb-name">Creator Account</div>
+        <div class="sb-role">TikTok · Sponsored content</div>
+      </div>
+      <a class="sb-cta" href="page3_entry.html"><span class="plus">+</span>New Content</a>
+      <nav class="sb-nav">
+        <a href="page0_dashboard.html"><span class="ic">▦</span>Dashboard</a>
+        <a href="page1_calendar.html"><span class="ic">▤</span>Calendar</a>
+      <a href="page7_insight.html"><span class="ic">✦</span>Insight</a>
+      </nav>
+      <div class="sb-foot-group">
+        <a href="page5_how_it_works.html"><span>⚙</span>How it works</a>
+        <a href="#"><span>⚙</span>Settings</a>
+        <a href="#"><span>⏻</span>Log out</a>
+      </div>
+    </aside>
+    <main class="maincard">
+<div class="page">
+
+  <a class="back" href="page1_calendar.html" style="text-decoration:none;">‹ Back to calendar</a>
+  <div class="crumb">Snacks &nbsp;›&nbsp; <b>Nut Brand — Campaign</b> &nbsp;›&nbsp; <b>Office Snack Taste-Test</b></div>
+  <div class="head-row">
+    <div>
+      <div class="h-title">Office Snack Taste-Test</div>
+      <div class="h-sub">TikTok · Unboxing · published Jul 1, 2026 at 7:30 PM · data recorded Jul 3, 2026 at 8:00 PM</div>
+      <div class="head-tags">
+        <span class="htag boost">Boosted · paid promotion ran on this piece</span>
+        <span class="htag window">Figures cover the first 2 days after publishing</span>
+      </div>
+    </div>
+    <div class="conf-pill">Medium confidence · 9 comparable pieces</div>
+  </div>
+
+  <!-- DIAGNOSIS -->
+  <section class="diagnosis">
+    <div class="diag-eyebrow">Diagnosis</div>
+    <div class="diag-stage">The drop is at the Order stage <span class="badge">▼ 38% below baseline</span></div>
+    <div class="diag-lead">Store visit and click both read within your normal range, and the drop appears at order. Impressions are set aside here because this piece was boosted, so its reach was paid rather than earned.</div>
+
+    <div class="diag-cols">
+      <div class="diag-card">
+        <span class="dc-tag content">Content side · yours to fix</span>
+        <div class="dc-factor">The opening did not hold viewers</div>
+        <div class="dc-evi">First-3s completion <b>58%</b> against your baseline of 72%, and average watch time <b>11.2s</b> against your usual 14s. Viewers left before the pitch, so fewer held viewers reached the point of purchase.</div>
+        <div class="dc-mini">Where it shows: the retention curve below falls away faster than your baseline right after the 3-second mark.</div>
+      </div>
+      <div class="diag-card">
+        <span class="dc-tag commercial">Commercial side · the offer</span>
+        <div class="dc-factor">Viewers reached the product page and the offer did not convert them</div>
+        <div class="dc-evi">GMV per click <b>$4.0</b> against your usual $5.6, at a unit price of <b>$68</b> against the $42 you usually carry. The people who clicked through were worth less than they normally are, which points at the price or the product page rather than your content.</div>
+        <div class="dc-mini">Where it shows: store visit and click both sit within your normal range, so the drop is not in getting people to the page.</div>
+      </div>
+    </div>
+
+    <div class="diag-next">
+      <div class="dn-tag">What to try next</div>
+      <div class="dn-text">Strengthen the opening on your next unboxing piece. The order-stage weakness sits more on the offer than on your content, so it is worth weighing whether this product is worth taking again at this price.</div>
+    </div>
+  </section>
+
+  <!-- ===== ACTION LIST (moved up, right after diagnosis) ===== -->
+  <div class="sec-h">Your action list</div>
+  <div class="panel full">
+    <div class="p-hint">Check off each step as you apply it to your next unboxing piece. What you check off here is what we read on the next piece to tell whether the advice actually worked.</div>
+    <div class="todo">
+      <div class="box">✓</div>
+      <div class="txt"><span class="side content">Content</span>Rework the first 3 seconds with a stronger hook, such as opening on the taste reaction or the price rather than the intro. First-3s completion was <b>58%</b> against your usual 72%, so fewer held viewers reached the point of purchase.</div>
+    </div>
+    <div class="todo">
+      <div class="box">✓</div>
+      <div class="txt"><span class="side content">Content</span>Bring the product mention forward. Average watch time was <b>11.2s</b> against your usual 14s, so viewers who left early never reached the pitch.</div>
+    </div>
+    <div class="todo">
+      <div class="box">✓</div>
+      <div class="txt"><span class="side content">Content</span>Skew this format toward women. They were 68% of viewers but 85% of buyers, while men watched and rarely bought, so leaning into what your women audience responds to should lift conversion.</div>
+    </div>
+    <div class="todo">
+      <div class="box">✓</div>
+      <div class="txt"><span class="side commercial">Commercial</span>Weigh whether this product is worth taking again at this price. Its unit price was <b>$68</b> against the ~$42 you usually carry, and GMV per click came in below your usual, so the people who clicked through converted worse than they normally do.</div>
+    </div>
+  </div>
+
+  <!-- ===== FUNNEL ===== -->
+  <div class="sec-h">Conversion path</div>
+  <div class="grid2">
+    <div class="panel">
+      <div class="p-head"><span class="p-title">Conversion Funnel</span><span class="p-note">as of Jul 3, 8:00 PM · first 2 days</span></div>
+      <div class="p-hint">Each stage is a step from being seen to buying. The rate is the share of the previous step that moved forward. Counts are shown for reference only, since they are still climbing and were lifted by the boost.</div>
+
+      <div class="f-stage">
+        <div class="f-row">
+          <div class="f-lbl">Impression<span class="f-def">times the piece was shown</span></div>
+          <div class="f-track"><div class="f-fill" style="width:100%;background:linear-gradient(90deg,#5a6cff,#8b98ff)">128,400</div></div>
+          <div class="f-meta"><span class="tag info">shown only · boosted</span></div>
+        </div>
+      </div>
+      <div class="f-stage">
+        <div class="f-row">
+          <div class="f-lbl">Store visit<span class="f-def">tapped through to the product page</span></div>
+          <div class="f-track"><div class="f-fill" style="width:64%;background:linear-gradient(90deg,#5a6cff,#8b98ff)">19,260</div></div>
+          <div class="f-meta"><span class="rate">15.0%</span><span class="tag within">≈ normal</span></div>
+        </div>
+        <div class="f-calc">store visits ÷ impressions · your usual ~14%</div>
+      </div>
+      <div class="f-stage">
+        <div class="f-row">
+          <div class="f-lbl">Click<span class="f-def">tapped buy or add-to-cart on the page</span></div>
+          <div class="f-track"><div class="f-fill" style="width:50%;background:linear-gradient(90deg,#5a6cff,#8b98ff)">9,630</div></div>
+          <div class="f-meta"><span class="rate">50.0%</span><span class="tag within">≈ normal</span></div>
+        </div>
+        <div class="f-calc">clicks ÷ store visits · your usual ~48%</div>
+      </div>
+      <div class="f-stage">
+        <div class="f-row">
+          <div class="f-lbl">Order<span class="f-def">paid and placed the order</span></div>
+          <div class="f-track"><div class="f-fill" style="width:22%;background:linear-gradient(90deg,#e06b62,#eb8f88)">770</div></div>
+          <div class="f-meta"><span class="rate">8.0%</span><span class="tag below">▼ below</span></div>
+        </div>
+        <div class="f-calc">orders ÷ store visits · your usual ~13% · this is where the drop is</div>
+      </div>
+    </div>
+
+    <div class="panel dev-panel">
+      <div class="p-head"><span class="p-title">Stage Deviation from Baseline</span></div>
+      <div class="p-hint">Where each stage sits against your normal range. The lowest bar is the diagnosed stage.</div>
+      <div class="dev-chart">
+        <div class="dev-row"><span class="dev-name">Store visit</span><span class="dev-track"><span class="dev-bar pos" style="width:9%;background:var(--within)"></span><span class="dev-lbl pos" style="left:calc(50% + 9% + 6px);color:var(--within)">+7%</span></span></div>
+        <div class="dev-row"><span class="dev-name">Click</span><span class="dev-track"><span class="dev-bar pos" style="width:6%;background:var(--within)"></span><span class="dev-lbl pos" style="left:calc(50% + 6% + 6px);color:var(--within)">+4%</span></span></div>
+        <div class="dev-row"><span class="dev-name">Order</span><span class="dev-track"><span class="dev-bar neg" style="width:42%;background:var(--below)"></span><span class="dev-lbl neg" style="right:calc(50% + 42% + 6px);color:var(--below)">−38%</span></span></div>
+        <div class="dev-row"><span class="dev-name">ARPU</span><span class="dev-track"><span class="dev-bar neg" style="width:33%;background:var(--below)"></span><span class="dev-lbl neg" style="right:calc(50% + 33% + 6px);color:var(--below)">−29%</span></span></div>
+      </div>
+      <div class="dev-axis"><span>−50%</span><span>baseline</span><span>+50%</span></div>
+    </div>
+  </div>
+
+  <!-- ===== COMMERCIAL ===== -->
+  <div class="sec-h">Commercial performance</div>
+  <div class="grid2">
+    <div class="panel">
+      <div class="p-head"><span class="p-title">Revenue Metrics</span><span class="p-note">as of Jul 3, 8:00 PM</span></div>
+      <div class="p-hint">GMV and orders are still accumulating at this point, so they are shown for reference and not compared to your baseline.</div>
+      <div class="stats">
+        <div class="stat"><div class="k">GMV</div><div class="v">$38,500 <span class="tag info">shown</span></div><div class="sub">still accumulating</div></div>
+        <div class="stat"><div class="k">Orders</div><div class="v">770 <span class="tag info">shown</span></div><div class="sub">still accumulating</div></div>
+        <div class="stat"><div class="k">Avg order value</div><div class="v">$50 <span class="tag within">≈</span></div><div class="sub">baseline ~$49</div></div>
+        <div class="stat"><div class="k">ARPU</div><div class="v">$0.30 <span class="tag below">▼</span></div><div class="sub">baseline ~$0.42</div></div>
+        <div class="stat"><div class="k">GMV / click</div><div class="v">$4.0 <span class="tag below">▼</span></div><div class="sub">baseline ~$5.6</div></div>
+        <div class="stat"><div class="k">Unit price</div><div class="v">$68 <span class="tag below">▼</span></div><div class="sub">your usual ~$42</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="p-head"><span class="p-title">Audience vs Buyers</span><span class="p-note">by gender</span></div>
+      <div class="p-hint">Who watched against who bought. A group that makes up more of your buyers than your viewers is buying above its share.</div>
+      <div class="aud-row">
+        <div class="aud-lbl"><span class="who">Women</span><span class="prop" style="color:var(--above)">buy above their share ▲</span></div>
+        <div class="aud-bars">
+          <div class="aud-bar" style="width:68%;background:var(--base)">viewers 68%</div>
+          <div class="aud-bar" style="width:85%;background:var(--self)">buyers 85%</div>
+        </div>
+      </div>
+      <div class="aud-row">
+        <div class="aud-lbl"><span class="who">Men</span><span class="prop" style="color:var(--below)">buy below their share ▼</span></div>
+        <div class="aud-bars">
+          <div class="aud-bar" style="width:32%;background:var(--base)">viewers 32%</div>
+          <div class="aud-bar" style="width:15%;background:var(--self)">buyers 15%</div>
+        </div>
+      </div>
+      <div class="aud-key">Women were most of your audience and an even larger share of your buyers, while men watched and rarely bought. Worth skewing this format toward women.</div>
+    </div>
+  </div>
+
+  <!-- ===== CONTENT SIGNALS ===== -->
+  <div class="sec-h">Content signals</div>
+  <div class="grid2">
+    <div class="panel">
+      <div class="p-head"><span class="p-title">Opening Retention</span></div>
+      <div class="p-hint">First-seconds completion against your baseline curve. The gap at 3s is where the piece lost viewers.</div>
+      <div class="legend"><span class="s"><i></i>This piece</span><span class="b"><i></i>Your baseline</span></div>
+      <svg viewBox="0 0 480 170" width="100%" height="170">
+        <line x1="38" y1="10" x2="38" y2="132" stroke="#e7e9ee"/>
+        <line x1="38" y1="132" x2="466" y2="132" stroke="#e7e9ee"/>
+        <text x="32" y="14" font-size="9" fill="#9aa0a8" text-anchor="end">100%</text>
+        <text x="32" y="75" font-size="9" fill="#9aa0a8" text-anchor="end">50%</text>
+        <text x="32" y="134" font-size="9" fill="#9aa0a8" text-anchor="end">0</text>
+        <text x="38" y="148" font-size="9" fill="#9aa0a8" text-anchor="middle">0s</text>
+        <text x="180" y="148" font-size="9" fill="#9aa0a8" text-anchor="middle">3s</text>
+        <text x="320" y="148" font-size="9" fill="#9aa0a8" text-anchor="middle">5s</text>
+        <text x="462" y="148" font-size="9" fill="#9aa0a8" text-anchor="middle">10s</text>
+        <polyline points="38,12 180,44 320,66 462,90" fill="none" stroke="#c4cad4" stroke-width="2.5" stroke-dasharray="5 3"/>
+        <polyline points="38,12 180,78 320,98 462,112" fill="none" stroke="#3d5afe" stroke-width="3"/>
+        <circle cx="180" cy="78" r="4" fill="#3d5afe"/>
+        <circle cx="180" cy="44" r="3.5" fill="#c4cad4"/>
+        <text x="190" y="74" font-size="10" fill="#3d5afe" font-weight="700">58%</text>
+        <text x="190" y="40" font-size="9" fill="#9aa0a8">baseline 72%</text>
+      </svg>
+    </div>
+
+    <div class="panel">
+      <div class="p-head"><span class="p-title">Engagement</span><span class="p-note">change vs your baseline</span></div>
+      <div class="p-hint">Each metric keeps its own unit, but the colored figure shows how far it sits from your baseline, so they read on one scale.</div>
+      <div class="stats" style="grid-template-columns:repeat(2,1fr);">
+        <div class="stat"><div class="k">Avg watch time</div><div class="v">11.2s</div><div class="dev below">−20% vs baseline ▼</div><div class="sub">baseline ~14s</div></div>
+        <div class="stat"><div class="k">Completion</div><div class="v">19%</div><div class="dev within">−5% vs baseline ≈</div><div class="sub">baseline ~20%</div></div>
+        <div class="stat"><div class="k">Save rate</div><div class="v">4.1%</div><div class="dev above">+37% vs baseline ▲</div><div class="sub">baseline ~3%</div></div>
+        <div class="stat"><div class="k">Comments</div><div class="v">312</div><div class="dev above">+73% vs baseline ▲</div><div class="sub">baseline ~180</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== POST-PUBLISH VALIDATION ===== -->
+  <div class="sec-h">Post-publish validation</div>
+  <div class="panel full">
+    <div class="p-hint">This piece follows one you reviewed on Jun 26. We take the steps you checked off on that piece and read this piece against them, so we can tell whether the advice you acted on actually helped.</div>
+
+    <div class="val-row"><span class="val-name">First-3s completion</span><span class="val-old">58%</span><span class="val-arrow">→</span><span class="val-new">71%</span><span class="tag above">▲ improved</span></div>
+    <div class="val-row"><span class="val-name">Order conversion</span><span class="val-old">8.0%</span><span class="val-arrow">→</span><span class="val-new">11.5%</span><span class="tag above">▲ improved</span></div>
+
+    <div class="verdict">
+      <div class="vh">The advice you applied helped</div>
+      <div class="vt">On the previous piece you checked off <b>rework the opening</b>. On this piece, first-3s completion rose from 58% to 71% and order conversion rose from 8.0% to 11.5%. The stage we flagged improved after you applied the step, so that recommendation is recorded as <b>helpful</b> and we will lean on this type of advice more for you.</div>
+    </div>
+  </div>
+
+  <!-- COLOR LEGEND -->
+  <div class="colorlegend">
+    <span><span class="sw" style="background:var(--self)"></span>This piece</span>
+    <span><span class="sw" style="background:var(--base)"></span>Baseline</span>
+    <span><span class="sw" style="background:var(--above)"></span>Above normal</span>
+    <span><span class="sw" style="background:var(--below)"></span>Below normal</span>
+    <span><span class="sw" style="background:var(--within)"></span>Within normal</span>
+    <span style="color:var(--faint)">· Low-confidence readings are labeled in text, not by color.</span>
+    <span style="color:var(--faint)">· “Shown” means displayed but not compared, because the value scales with reach.</span>
+  </div>
+
+</div>
+</main>
+</div>
+</div>
+<script>
+  document.querySelectorAll('.todo').forEach(t=>{ t.onclick=()=>t.classList.toggle('done'); });
+
+  // Reads the piece id passed from the calendar page. The content below is
+  // still a fixed example dataset; this only proves the navigation carries
+  // the right identifier through. Swapping in a real per-piece data fetch
+  // keyed on `pieceId` is the next step once the backend exists.
+  const pieceId = new URLSearchParams(location.search).get('piece');
+  if (pieceId) document.title = `Content Review — ${pieceId}`;
+</script>
+</body>
+</html>

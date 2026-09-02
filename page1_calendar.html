@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaign Calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#241d18; --sub:#8b8178; --faint:#b3a99d; --line:#e9ddd0; --hair:#f3ece2;
+    --bg:#fdf6ee; --card:#ffffff;
+    --above:#3d9668; --below:#c2483f; --within:#a89c8d; --amber:#c98a2b;
+    --above-bg:#e6f2ea; --below-bg:#f9e6e3; --within-bg:#f1ece4;
+    --self:#e8583a; --accent-soft:#fbe4da;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html, body{height:100%;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.4;overflow:hidden;}
+  .display{font-family:"Fraunces",Georgia,serif;font-weight:700;letter-spacing:-.015em;}
+
+  .frame{padding:34px;height:100vh;}
+  .shell{max-width:1400px;margin:0 auto;background:#f0c39e;border-radius:28px;padding:14px;display:flex;gap:14px;height:100%;overflow:hidden;}
+  .sidebar{width:220px;flex-shrink:0;background:#faf3ea;border-radius:20px;padding:26px 20px;display:flex;flex-direction:column;height:100%;overflow-y:auto;}
+  .sb-brand{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;}
+  .sb-brand .dot{width:9px;height:9px;border-radius:50%;background:var(--self);display:inline-block;}
+  .sb-profile{margin-top:32px;}
+  .sb-cta{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;padding:13px;border-radius:14px;background:var(--self);color:#fff;font-size:14px;font-weight:800;text-decoration:none;box-shadow:0 4px 10px -3px rgba(232,88,58,.45);}
+  .sb-cta:hover{filter:brightness(1.05);}
+  .sb-cta .plus{font-size:17px;line-height:1;}
+  .sb-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--self),#f4a06f);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;}
+  .sb-name{font-size:14px;font-weight:800;margin-top:10px;}
+  .sb-role{font-size:11px;color:var(--sub);margin-top:1px;}
+  .sb-nav{margin-top:26px;display:flex;flex-direction:column;gap:4px;}
+  .sb-nav a{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-nav a .ic{width:16px;text-align:center;}
+  .sb-nav a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .sb-nav a.active .ic{color:var(--self);}
+  .sb-dropdown a{font-size:12px;font-weight:600;color:var(--faint);text-decoration:none;padding:7px 10px;border-radius:8px;}
+  .sb-dropdown a:hover{background:var(--hair);color:var(--sub);}
+
+  .sb-foot-group{margin-top:auto;display:flex;flex-direction:column;gap:2px;}
+  .sb-foot-group a{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--faint);text-decoration:none;padding:10px 12px;border-radius:10px;}
+  .sb-foot-group a:hover{background:var(--hair);color:var(--sub);}
+  .sb-foot-group a.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .maincard{flex:1;background:var(--card);border-radius:20px;padding:30px 34px 36px;height:100%;overflow-y:auto;}
+  .page{width:100%;margin:0;background:var(--card);min-height:auto;padding:0;}
+
+  /* header */
+  .top{padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .top-row{display:flex;justify-content:space-between;align-items:flex-end;}
+  .brand{font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.01em;}
+  .h1-line{display:flex;align-items:center;gap:14px;margin-top:4px;}
+  .h1{font-size:22px;font-weight:800;letter-spacing:-.01em;}
+  .h-sub{font-size:12px;color:var(--sub);margin-top:3px;}
+
+  .toolbar{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-top:18px;margin-bottom:14px;}
+  .month-nav{display:flex;align-items:center;gap:10px;}
+  .msel{font:inherit;font-size:15px;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 30px 6px 12px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236a7078' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+  .msel:hover{border-color:var(--base);}
+  .msel:focus{outline:none;border-color:var(--self);}
+  .gran{display:flex;background:#ebedf0;border-radius:8px;padding:2px;}
+  .gran button{border:none;background:none;font:inherit;font-size:12px;font-weight:600;color:var(--sub);padding:6px 16px;border-radius:6px;cursor:pointer;}
+  .gran button.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06);}
+
+  .piece-nav{display:none;align-items:center;gap:10px;}
+  .piece-nav.show{display:flex;}
+  .pnav-btn{width:30px;height:30px;flex-shrink:0;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:15px;line-height:1;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .pnav-btn:hover{border-color:var(--self);color:var(--self);}
+  .pnav-btn:disabled{opacity:.4;cursor:default;}
+  .pnav-btn:disabled:hover{border-color:var(--line);color:var(--ink);}
+  .pnav-count{font-size:12px;color:var(--sub);min-width:150px;text-align:center;}
+  .pnav-count b{color:var(--ink);}
+
+  /* ===== MONTH GRID ===== */
+  .month{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .dow{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);text-align:center;padding:4px 0 6px;}
+  .cell{min-height:104px;border:1px solid var(--hair);border-radius:9px;padding:7px 7px 6px;display:flex;flex-direction:column;gap:4px;}
+  .cell.out{background:#fafbfc;}
+  .cell .dnum{font-size:11px;font-weight:600;color:var(--faint);}
+  .cell.today .dnum{color:var(--self);font-weight:800;}
+  .evt{position:relative;border-radius:6px;padding:5px 7px;cursor:pointer;border-left:3px solid var(--within);background:var(--within-bg);display:block;text-decoration:none;color:inherit;}
+  .evt .plat-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;}
+  .evt:hover{filter:brightness(.97);}
+  .evt.above{border-left-color:var(--above);background:var(--above-bg);}
+  .evt.below{border-left-color:var(--below);background:var(--below-bg);}
+  .evt.within{border-left-color:var(--within);background:var(--within-bg);}
+  .evt .prod{font-size:10px;font-weight:700;line-height:1.2;color:var(--ink);}
+  .evt .camp{font-size:9px;color:var(--sub);line-height:1.2;margin-top:1px;}
+  .evt .time{font-size:8px;color:var(--faint);margin-top:2px;}
+
+
+  /* ===== DAY VIEW ===== */
+  .daywrap{display:none;}
+  .daywrap.show{display:block;}
+  .day-head{font-size:15px;font-weight:700;margin-bottom:14px;}
+  .day-card{border:1px solid var(--line);border-radius:12px;padding:0;max-width:760px;overflow:hidden;border-left:4px solid var(--within);}
+  .day-card.below{border-left-color:var(--below);}
+  .day-card.above{border-left-color:var(--above);}
+  .day-card.within{border-left-color:var(--within);}
+  .dc-top{cursor:pointer;}
+  .dc-top:hover .prod{text-decoration:underline;}
+  .dc-top{padding:16px 18px;background:#fafbfc;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;}
+  .dc-top .prod{font-size:15px;font-weight:800;}
+  .dc-top .camp{font-size:13px;color:var(--sub);margin-top:2px;}
+  .dc-top .meta{font-size:11px;color:var(--faint);margin-top:6px;}
+  .dc-top .rd{text-align:right;flex-shrink:0;}
+  .dc-top .rd .cvr{font-size:16px;font-weight:800;}
+  .dc-top .rd .lbl{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;margin-top:4px;display:inline-block;}
+  .dc-top .rd .lbl.below{background:var(--below-bg);color:var(--below);}
+  .dc-top .rd .lbl.above{background:var(--above-bg);color:var(--above);}
+  .dc-top .rd .lbl.within{background:var(--within-bg);color:var(--within);}
+  .dc-body{padding:16px 18px;}
+  .dc-diag{font-size:12px;color:var(--sub);margin-bottom:14px;line-height:1.5;}
+  .dc-diag b{color:var(--ink);}
+  .todo-title{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--sub);margin-bottom:10px;}
+  .todo{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-top:1px solid var(--hair);cursor:pointer;}
+  .todo:first-of-type{border-top:none;}
+  .todo .box{width:20px;height:20px;border:2px solid var(--line);border-radius:6px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;transition:all .12s;}
+  .todo.done .box{background:var(--above);border-color:var(--above);}
+  .todo .txt{font-size:13px;line-height:1.45;}
+  .todo .txt .side{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:1px 6px;border-radius:4px;margin-right:7px;vertical-align:middle;}
+  .todo .txt .side.content{background:var(--accent-soft);color:var(--self);}
+  .todo .txt .side.commercial{background:#fdeee0;color:#c07a1e;}
+  .todo.done .txt{color:var(--faint);text-decoration:line-through;}
+  .todo.done .txt .side{opacity:.5;}
+  .todo-foot{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:11px;color:var(--faint);}
+
+  /* legend */
+  .legend{display:flex;gap:16px;margin-top:20px;padding:11px 16px;background:#f7f8fa;border:1px solid var(--line);border-radius:10px;font-size:11px;color:var(--sub);}
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .sw{width:11px;height:11px;border-radius:3px;}
+  .sw.round{border-radius:50%;width:9px;height:9px;}
+  .hint{font-size:11px;color:var(--faint);margin-top:12px;}
+
+  .plat-dd{position:relative;}
+  .plat-dd-btn{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:9px 15px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;}
+  .plat-dd-btn:hover{border-color:var(--self);}
+  .plat-dd-btn .car{font-size:10px;color:var(--faint);}
+  .plat-dd-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px;min-width:170px;box-shadow:0 10px 26px -10px rgba(0,0,0,.2);z-index:30;}
+  .plat-dd-menu.open{display:block;}
+  .plat-dd-menu a{display:block;font-size:13px;font-weight:600;color:var(--sub);text-decoration:none;padding:9px 12px;border-radius:8px;}
+  .plat-dd-menu a:hover{background:var(--hair);}
+  .plat-dd-menu a.active{background:var(--accent-soft);color:var(--self);}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sb-brand"><span class="dot"></span>Campaign Review</div>
+      <div class="sb-profile">
+        <div class="sb-avatar">CJ</div>
+        <div class="sb-name">Creator Account</div>
+        <div class="sb-role">TikTok · Sponsored content</div>
+      </div>
+      <a class="sb-cta" href="page3_entry.html"><span class="plus">+</span>New Content</a>
+      <nav class="sb-nav">
+        <a href="page0_dashboard.html"><span class="ic">▦</span>Dashboard</a>
+        <a class="active" href="page1_calendar.html"><span class="ic">▤</span>Calendar</a>
+      <a href="page7_insight.html"><span class="ic">✦</span>Insight</a>
+      </nav>
+      <div class="sb-foot-group">
+        <a href="page5_how_it_works.html"><span>⚙</span>How it works</a>
+        <a href="#"><span>⚙</span>Settings</a>
+        <a href="#"><span>⏻</span>Log out</a>
+      </div>
+    </aside>
+    <main class="maincard">
+<div class="page">
+
+  <div class="top">
+    <div class="top-row">
+      <div>
+        <div class="brand">Campaign Content Review</div>
+        <div class="h1-line">
+          <div class="h1 display">Publishing Calendar</div>
+          <div class="gran">
+            <button class="active" data-v="month">Month</button>
+            <button data-v="day">Day</button>
+          </div>
+        </div>
+        <div class="h-sub">Every campaign piece on its publish date. Color shows its order-conversion reading against your baseline.</div>
+      </div>
+      <div class="plat-dd" id="platDD">
+        <button class="plat-dd-btn" id="platDDBtn" type="button">All platforms <span class="car">▾</span></button>
+        <div class="plat-dd-menu" id="platDDMenu"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="month-nav">
+      <select class="msel" id="monthSel"></select>
+      <select class="msel" id="yearSel"></select>
+    </div>
+    <div class="piece-nav" id="pieceNav">
+      <button class="pnav-btn" id="prevPiece" title="上一条" aria-label="Previous piece">‹</button>
+      <div class="pnav-count" id="pnavCount"></div>
+      <button class="pnav-btn" id="nextPiece" title="下一条" aria-label="Next piece">›</button>
+    </div>
+  </div>
+
+  <!-- ============ MONTH ============ -->
+  <div class="month" id="monthView"></div>
+
+  <!-- ============ DAY ============ -->
+  <div class="daywrap" id="dayView">
+    <div class="day-head" id="dayHead"></div>
+    <div class="day-card" id="dayCard">
+      <div class="dc-top" id="dcTop">
+        <div>
+          <div class="prod" id="dcProd"></div>
+          <div class="camp" id="dcCamp"></div>
+          <div class="meta" id="dcMeta"></div>
+        </div>
+        <div class="rd">
+          <div class="cvr" id="dcCvr"></div>
+          <span class="lbl" id="dcLbl"></span>
+        </div>
+      </div>
+      <div class="dc-body">
+        <div class="dc-diag">The drop is at the <b>Order</b> stage. Impression, store visit, and click all read normal, so viewers reached the product and did not buy. Here is what to act on before your next unboxing piece:</div>
+        <div class="todo-title">Your action list — check off what you've done</div>
+
+        <div class="todo">
+          <div class="box">✓</div>
+          <div class="txt"><span class="side content">Content</span>Rework the first 3 seconds with a stronger hook, such as opening on the taste reaction or the price rather than the intro. First-3s completion was 58% against your usual 72%, so fewer held viewers reached the point of purchase.</div>
+        </div>
+        <div class="todo">
+          <div class="box">✓</div>
+          <div class="txt"><span class="side content">Content</span>Bring the product mention forward. Average watch time was 11.2s against your usual 14s, so viewers who left early never reached the pitch.</div>
+        </div>
+        <div class="todo">
+          <div class="box">✓</div>
+          <div class="txt"><span class="side content">Content</span>Skew this format toward women. They were 68% of viewers but 85% of buyers, while men watched and rarely bought, so leaning into what your women audience responds to should lift conversion.</div>
+        </div>
+        <div class="todo">
+          <div class="box">✓</div>
+          <div class="txt"><span class="side commercial">Commercial</span>Weigh whether this product is worth taking again at this price. Its unit price was ¥68 against the ~¥42 you usually carry, and GMV per click came in below your usual, so the people who clicked through converted worse than they normally do.</div>
+        </div>
+
+        <div class="todo-foot">When you publish your next unboxing piece, we compare it on these stages and confirm whether the changes worked.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend" id="legendRow">
+    <span><span class="sw" style="background:var(--above)"></span>Above your baseline</span>
+    <span><span class="sw" style="background:var(--below)"></span>Below your baseline</span>
+    <span><span class="sw" style="background:var(--within)"></span>Within your normal range</span>
+    <span id="platLegend" style="display:contents;"></span>
+  </div>
+  <div class="hint">Each label shows the product and campaign. Tap any piece to open its review. Date-range filtering lives in the list view.</div>
+
+</div>
+</main>
+</div>
+</div>
+
+<script src="js/engine.js"></script>
+<script>
+
+  // ---- platform dropdown (top-right) ----
+  (function(){
+    const btn = document.getElementById('platDDBtn');
+    const menu = document.getElementById('platDDMenu');
+    const filter = CCR.getPlatformFilter();
+    const options = ['all', ...CCR.getAvailablePlatforms()];
+    btn.innerHTML = (filter === 'all' ? 'All platforms' : filter) + ' <span class="car">▾</span>';
+    menu.innerHTML = options.map(p => {
+      const label = p === 'all' ? 'All platforms' : p;
+      return `<a href="#" class="${p === filter ? 'active' : ''}" data-platform="${p}">${label}</a>`;
+    }).join('');
+    btn.onclick = (e) => { e.stopPropagation(); menu.classList.toggle('open'); };
+    menu.querySelectorAll('a').forEach(a => {
+      a.onclick = (e) => { e.preventDefault(); CCR.setPlatformFilter(a.dataset.platform); location.reload(); };
+    });
+    document.addEventListener('click', () => menu.classList.remove('open'));
+  })();
+
+  const mv=document.getElementById('monthView'), dv=document.getElementById('dayView');
+  const pieceNav=document.getElementById('pieceNav');
+
+  document.querySelectorAll('.gran button').forEach(b=>{
+    b.onclick=()=>{
+      document.querySelectorAll('.gran button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      const v=b.dataset.v;
+      mv.style.display = v==='month'?'grid':'none';
+      dv.classList.toggle('show', v==='day');
+      pieceNav.classList.toggle('show', v==='day');
+    };
+  });
+  document.querySelectorAll('.todo').forEach(t=>{
+    t.onclick=()=>t.classList.toggle('done');
+  });
+
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DOW_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const DEMO_TODAY = new Date('2026-07-01T12:00:00'); // fixed reference date so "today" styling matches the demo narrative, not the real device clock
+  const DEMO_TODAY_MONTH_NAME = MONTH_NAMES[DEMO_TODAY.getMonth()];
+
+  // Builds the day-view display shape (date labels, cvr text, badge, color
+  // class) for one raw CCR piece by running it through the real engine —
+  // no more hand-written duplicate numbers per piece.
+  function buildPieceView(raw){
+    const d = new Date(raw.publishedAt);
+    const diag = CCR.diagnose(raw.id);
+    const reading = diag.weakStage ? diag.readings[diag.weakStage] : null;
+    let cls, badge;
+    if (reading === 'below'){ cls = 'below'; badge = '▼ below baseline'; }
+    else if (diag.sampleSize < 2){ cls = 'within'; badge = 'Building baseline'; }
+    else if (reading === 'above'){ cls = 'above'; badge = '▲ above baseline'; }
+    else { cls = 'within'; badge = 'Within baseline'; }
+    const orderPct = diag.piece.orderConversionRate != null ? (diag.piece.orderConversionRate*100).toFixed(1) + '%' : '—';
+    const timeLabel = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    const monthName = MONTH_NAMES[d.getMonth()];
+    return {
+      id: raw.id, month: monthName, year: String(d.getFullYear()), day: d.getDate(), timeLabel,
+      date: `${DOW_NAMES[d.getDay()]}, ${monthName} ${d.getDate()}`,
+      shortDate: `${monthName.slice(0,3)} ${d.getDate()}, ${d.getFullYear()}`,
+      prod: raw.product, camp: raw.campaign, platform: raw.platform,
+      meta: `${raw.format === 'unboxing' ? 'Unboxing' : 'Daily Share'} · ${raw.platform} · ${raw.boost} · published ${monthName.slice(0,3)} ${d.getDate()}, ${timeLabel}`,
+      cvr: `Order ${orderPct}`, badge, cls,
+      // seed pieces with a hand-written detail page keep their richer static
+      // review; everything else (including anything entered live) routes to
+      // the engine-computed review
+      href: (raw.id === 'nut-brand-office-snack-taste-test') ? `page2_detail.html?piece=${raw.id}` : `page4_review.html?piece=${raw.id}`,
+    };
+  }
+
+  function getAllPieceViews(){
+    return CCR.getFilteredPieces().map(buildPieceView).sort((a,b) => new Date(a.year, MONTH_NAMES.indexOf(a.month), a.day) - new Date(b.year, MONTH_NAMES.indexOf(b.month), b.day));
+  }
+
+  let pieces = getAllPieceViews();
+  let curIdx = 0;
+  let monthPieces = [];
+
+  const monthSel=document.getElementById('monthSel'), yearSel=document.getElementById('yearSel');
+  const dayHead=document.getElementById('dayHead'), dayCard=document.getElementById('dayCard'),
+        dcTop=document.getElementById('dcTop'), dcProd=document.getElementById('dcProd'),
+        dcCamp=document.getElementById('dcCamp'), dcMeta=document.getElementById('dcMeta'),
+        dcCvr=document.getElementById('dcCvr'), dcLbl=document.getElementById('dcLbl'),
+        pnavCount=document.getElementById('pnavCount'),
+        prevBtn=document.getElementById('prevPiece'), nextBtn=document.getElementById('nextPiece'),
+        monthViewEl=document.getElementById('monthView');
+
+  // ------------------------------------------------------------------
+  // Month/year dropdowns: only ever list combinations that actually have
+  // a piece, so switching never lands on a silently-empty month.
+  // ------------------------------------------------------------------
+  function populateMonthYearSelects(){
+    const monthsPresent = [...new Set(pieces.map(p => p.month))].sort((a,b) => MONTH_NAMES.indexOf(a) - MONTH_NAMES.indexOf(b));
+    const yearsPresent = [...new Set(pieces.map(p => p.year))].sort();
+
+    const prevMonth = monthSel.value, prevYear = yearSel.value;
+    monthSel.innerHTML = monthsPresent.map(m => `<option>${m}</option>`).join('');
+    yearSel.innerHTML = yearsPresent.map(y => `<option>${y}</option>`).join('');
+
+    if (monthsPresent.includes(prevMonth)) monthSel.value = prevMonth;
+    if (yearsPresent.includes(prevYear)) yearSel.value = prevYear;
+    if (!monthSel.value || !monthsPresent.includes(monthSel.value)){
+      // default to whichever month has the most pieces, preferring the demo's reference month if tied
+      const counts = {};
+      pieces.forEach(p => { counts[p.month] = (counts[p.month]||0) + 1; });
+      monthSel.value = monthsPresent.slice().sort((a,b) => (counts[b]||0) - (counts[a]||0) || (a===DEMO_TODAY_MONTH_NAME?-1:0))[0] || monthsPresent[0];
+    }
+    if (!yearSel.value || !yearsPresent.includes(yearSel.value)) yearSel.value = yearsPresent[0];
+  }
+
+  // ------------------------------------------------------------------
+  // Month grid: fully computed from real dates, not a hand-placed static
+  // block. Renders whichever month/year the dropdowns currently hold.
+  // ------------------------------------------------------------------
+  const PLAT_COLORS = { TikTok:'#241d18', RedNote:'#e0435a', Instagram:'#c2185b' };
+
+  function renderMonthGrid(){
+    const monthName = monthSel.value, year = Number(yearSel.value);
+    const monthIndex = MONTH_NAMES.indexOf(monthName);
+    if (monthIndex === -1 || !year){ monthViewEl.innerHTML = ''; return; }
+
+    const firstDow = new Date(year, monthIndex, 1).getDay();
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, monthIndex, 0).getDate();
+
+    const byDay = {};
+    pieces.filter(p => p.month === monthName && p.year === String(year)).forEach(p => {
+      (byDay[p.day] = byDay[p.day] || []).push(p);
+    });
+
+    let html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div class="dow">${d}</div>`).join('');
+
+    for (let i = firstDow - 1; i >= 0; i--){
+      html += `<div class="cell out"><span class="dnum">${daysInPrevMonth - i}</span></div>`;
+    }
+    for (let day = 1; day <= daysInMonth; day++){
+      const isToday = DEMO_TODAY.getFullYear() === year && DEMO_TODAY.getMonth() === monthIndex && DEMO_TODAY.getDate() === day;
+      let cell = `<div class="cell${isToday ? ' today' : ''}"><span class="dnum">${day}</span>`;
+      (byDay[day] || []).forEach(p => {
+        cell += `<a class="evt ${p.cls}" href="${p.href}" data-piece="${p.id}"><span class="plat-dot" style="background:${PLAT_COLORS[p.platform]||'#8b8178'}"></span><div class="prod">${p.prod}</div><div class="camp">${p.camp}</div><div class="time">${p.timeLabel}</div></a>`;
+      });
+      cell += '</div>';
+      html += cell;
+    }
+    const totalSoFar = firstDow + daysInMonth;
+    const trailing = (7 - (totalSoFar % 7)) % 7;
+    for (let i = 1; i <= trailing; i++){
+      html += `<div class="cell out"><span class="dnum">${i}</span></div>`;
+    }
+    monthViewEl.innerHTML = html;
+  }
+
+  // ------------------------------------------------------------------
+  // Day view: prev/next steps through whatever month is currently selected.
+  // ------------------------------------------------------------------
+  function refreshMonthPieces(){
+    monthPieces = pieces.filter(p => p.month === monthSel.value && p.year === yearSel.value);
+    curIdx = 0;
+  }
+
+  function renderPiece(){
+    if (monthPieces.length === 0){
+      dayHead.textContent = `No content published in ${monthSel.value} ${yearSel.value}`;
+      dcTop.style.display = 'none';
+      document.querySelector('.dc-body').style.display = 'none';
+      pnavCount.textContent = '0 pieces this month';
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      return;
+    }
+    dcTop.style.display = '';
+    document.querySelector('.dc-body').style.display = '';
+    prevBtn.disabled = false;
+    nextBtn.disabled = false;
+
+    const p = monthPieces[curIdx];
+    dayHead.textContent = p.date;
+    dcProd.textContent = p.prod;
+    dcCamp.textContent = p.camp;
+    dcMeta.textContent = p.meta;
+    dcCvr.textContent = p.cvr;
+    dcLbl.textContent = p.badge;
+    dcLbl.className = 'lbl ' + p.cls;
+    dayCard.className = 'day-card ' + p.cls;
+    dcTop.onclick = () => location.href = p.href;
+    pnavCount.innerHTML = `<b>${curIdx + 1}</b> / ${monthPieces.length} pieces this month`;
+  }
+
+  prevBtn.onclick = () => {
+    curIdx = (curIdx - 1 + monthPieces.length) % monthPieces.length;
+    renderPiece();
+  };
+  nextBtn.onclick = () => {
+    curIdx = (curIdx + 1) % monthPieces.length;
+    renderPiece();
+  };
+
+  monthSel.onchange = () => { refreshMonthPieces(); renderMonthGrid(); renderPiece(); };
+  yearSel.onchange = () => { refreshMonthPieces(); renderMonthGrid(); renderPiece(); };
+
+  populateMonthYearSelects();
+  refreshMonthPieces();
+  renderMonthGrid();
+  renderPiece();
+
+  // small round dot in the corner of each event marks its platform — this
+  // legend explains what those colors mean
+  (function(){
+    const el = document.getElementById('platLegend');
+    if (!el) return;
+    const platforms = CCR.getAvailablePlatforms();
+    el.innerHTML = '<span style="width:1px;height:12px;background:var(--line);"></span>' +
+      platforms.map(p => `<span><span class="sw round" style="background:${PLAT_COLORS[p]||'#8b8178'}"></span>${p}</span>`).join('');
+  })();
+</script>
+</body>
+</html>
