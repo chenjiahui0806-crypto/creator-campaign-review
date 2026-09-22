@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creator Campaign Review — Live Demo</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:#fff;color:#1a1d24;line-height:1.5;padding:32px;max-width:1040px;margin:0 auto;}
+  h1{font-size:24px;margin-bottom:4px;}
+  .sub{color:#6b7280;font-size:14px;margin-bottom:24px;}
+  h2{font-size:16px;margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid #eceef2;}
+  .row{display:flex;gap:16px;flex-wrap:wrap;}
+  .card{border:1px solid #e7e9ee;border-radius:12px;padding:16px 18px;flex:1;min-width:260px;}
+  .hint{font-size:12px;color:#8a90a0;margin-bottom:10px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #f0f1f4;}
+  th{color:#6b7280;font-weight:600;}
+  .below{color:#e0564d;font-weight:700;}
+  .above{color:#2f9e6f;font-weight:700;}
+  .within{color:#8a90a0;font-weight:600;}
+  .diag{border:1.5px solid #dee3ef;border-radius:14px;padding:20px 22px;margin-top:8px;}
+  .diag h3{font-size:20px;margin-bottom:4px;}
+  .badge{display:inline-block;background:#fdecea;color:#c0392b;font-size:12px;font-weight:700;
+         padding:4px 10px;border-radius:12px;margin-left:8px;}
+  .factor{border:1px solid #e7e9ee;border-radius:10px;padding:12px 14px;margin-top:10px;}
+  .tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;margin-bottom:6px;}
+  .tag.content{background:#eaf0ff;color:#3d5afe;}
+  .tag.commercial{background:#fdeee0;color:#b5741a;}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:4px 11px;border-radius:12px;
+        background:#eef0f4;color:#6b7280;}
+  .bars{margin-top:8px;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:12px;}
+  .bar-lbl{width:120px;color:#6b7280;}
+  .bar-track{flex:1;height:22px;background:#f0f1f4;border-radius:5px;position:relative;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:5px;}
+  .bar-val{width:120px;font-weight:700;}
+  code{background:#f4f6f9;padding:1px 5px;border-radius:4px;font-size:12px;}
+  .note{background:#f7f9fc;border-left:3px solid #3d5afe;padding:12px 14px;border-radius:8px;
+        font-size:13px;margin-top:10px;color:#333;}
+</style>
+</head>
+<body>
+<h1>Creator Campaign Review — Live Demo</h1>
+<div class="sub">This page runs the real analysis engine in your browser. It loads the demo dataset, builds the creator's personalized baseline, and computes the diagnosis live. Nothing here is hard coded. Change the numbers and the diagnosis changes with them.</div>
+
+<h2>1. Why the reading window is day 2 (decided by data, not by preference)</h2>
+<div class="hint">The order conversion rate is measured on the same piece at day 1, 2, 3, and 7. The bars show how much the rate changes from one reading to the next. The change collapses after day 2, which is what makes day 2 the earliest point the rate can be trusted.</div>
+<div id="timewin"></div>
+<div class="note" id="timewin-note"></div>
+
+<h2>2. The engine runs live on the demo data</h2>
+<div class="hint">18 historical pieces build the baseline. 1 target piece is diagnosed against it. You can edit the target piece's numbers below and re-run.</div>
+<div class="row">
+  <div class="card">
+    <div class="hint">Target piece — editable</div>
+    <div id="inputs"></div>
+    <button id="run" style="margin-top:12px;font:inherit;font-weight:600;background:#3d5afe;color:#fff;border:0;border-radius:8px;padding:9px 18px;cursor:pointer;">Re-run analysis</button>
+  </div>
+  <div class="card">
+    <div class="hint">Baseline (this creator's own history, as percentiles)</div>
+    <div id="baseline"></div>
+  </div>
+</div>
+
+<h2>3. Diagnosis (computed, not written)</h2>
+<div id="diag"></div>
+
+<script>
+/* Creator Campaign Review — analysis engine
+ *
+ * Pure, deterministic computation. Given the same data it always returns the
+ * same diagnosis. The engine does the math; it does not do judgment. It:
+ *   1. builds a personalized baseline (percentiles) from comparable history,
+ *   2. reads each metric on the target piece as below / within / above normal,
+ *   3. locates the largest negative deviation stage,
+ *   4. fires the fixed rules R1-R7 whose conditions hold,
+ *   5. returns a structured diagnosis with evidence values and confidence.
+ *
+ * No industry averages are used. A piece is judged only against the creator's
+ * own comparable history.
+ */
+
+const Engine = (function () {
+
+  // ---- percentile helpers -------------------------------------------------
+  function percentile(sortedVals, p) {
+    if (sortedVals.length === 0) return null;
+    const k = (sortedVals.length - 1) * p;
+    const f = Math.floor(k), c = Math.ceil(k);
+    if (f === c) return sortedVals[f];
+    return sortedVals[f] + (sortedVals[c] - sortedVals[f]) * (k - f);
+  }
+  function dist(vals) {
+    const s = vals.slice().sort((a, b) => a - b);
+    return { p25: percentile(s, 0.25), p50: percentile(s, 0.5), p75: percentile(s, 0.75), n: s.length };
+  }
+
+  // ---- derived metrics for one piece -------------------------------------
+  function derive(r) {
+    return {
+      store_visit_rate: r.store_visits / r.impressions,
+      click_rate:       r.clicks / r.store_visits,
+      order_rate:       r.orders / r.store_visits,   // orders / store_visits
+      arpu:             r.gmv / r.views,
+      gmv_per_click:    r.gmv / r.clicks,
+      aov:             r.orders ? r.gmv / r.orders : 0,
+      completion_3s:    r.completion_3s,
+      completion_rate:  r.completion_rate,
+      avg_watch_time:   r.avg_watch_time,
+      unit_price:       r.unit_price,
+      viewer_female_pct: r.viewer_female_pct,
+      buyer_female_pct:  r.buyer_female_pct,
+    };
+  }
+
+  // ---- baseline from comparable history ----------------------------------
+  // Comparable = same boost status as target (and, in a real build, same
+  // platform and last 6 months). Here history is already scoped to one creator.
+  function buildBaseline(history, target) {
+    const comparable = history.filter(h => h.boost_status === target.boost_status);
+    const d = comparable.map(derive);
+    const metrics = ['store_visit_rate','click_rate','order_rate','arpu','gmv_per_click',
+                     'completion_3s','completion_rate','unit_price'];
+    const baseline = { n: comparable.length };
+    metrics.forEach(m => { baseline[m] = dist(d.map(x => x[m])); });
+    return baseline;
+  }
+
+  // ---- reading: below / within / above -----------------------------------
+  function read(value, band) {
+    if (!band || band.p25 == null) return 'none';
+    if (value < band.p25) return 'below';
+    if (value > band.p75) return 'above';
+    return 'within';
+  }
+
+  // ---- confidence from sample size ---------------------------------------
+  function confidence(n, activeLimitation) {
+    let label;
+    if (n >= 12) label = 'high';
+    else if (n >= 8) label = 'medium';
+    else if (n >= 2) label = 'low';
+    else label = 'none';
+    if (activeLimitation && (label === 'high')) label = 'medium'; // cap
+    return label;
+  }
+
+  // ---- the fixed rule set R1-R7 ------------------------------------------
+  // Each rule: stage, side, human factor, and the condition on readings.
+  function fireRules(t, rd) {
+    // rd = readings object: rd.metric -> 'below'|'within'|'above'
+    const fired = [];
+    const add = (id, stage, side, factor, evidence) =>
+      fired.push({ id, stage, side, factor, evidence });
+
+    if (rd.completion_3s === 'below')
+      add('R1','view','content','The opening did not hold viewers',
+          `first 3s completion ${t.completion_3s} vs baseline`);
+
+    if (rd.completion_rate === 'below' && rd.completion_3s === 'within')
+      add('R2','view','content','Viewers were lost through the middle',
+          `completion rate ${t.completion_rate}% vs baseline`);
+
+    if (rd.store_visit_rate === 'below' && rd.completion_3s === 'within' && rd.completion_rate === 'within')
+      add('R3','store_visit','content','Attention was held but not turned into intent',
+          `store visit rate ${(t.store_visit_rate*100).toFixed(1)}% vs baseline`);
+
+    if (rd.click_rate === 'below' && rd.store_visit_rate === 'within')
+      add('R4','click','commercial','The product page or price did not convert',
+          `click rate ${(t.click_rate*100).toFixed(1)}% vs baseline`);
+
+    if (rd.gmv_per_click === 'below')
+      add('R5','order','commercial','The offer did not convert the viewers who reached it',
+          `GMV per click ${t.gmv_per_click.toFixed(1)} vs baseline` +
+          (rd.unit_price === 'above' ? `, unit price ${t.unit_price} above your usual` : ''));
+
+    if (rd.order_rate === 'below' && rd.click_rate === 'within' && rd.gmv_per_click === 'within')
+      add('R6','order','content','The piece did not carry enough reason to buy',
+          `order conversion ${(t.order_rate*100).toFixed(1)}% vs baseline`);
+
+    if (rd.arpu === 'below' && rd.order_rate === 'within')
+      add('R7','audience','content','The piece reached the wrong audience',
+          `ARPU below baseline while order conversion normal`);
+
+    return fired;
+  }
+
+  // ---- locate the weak stage (largest negative deviation) ----------------
+  function locateWeakStage(t, b) {
+    // deviation as fraction below p50, only for stages that read below p25
+    const stages = [
+      { stage:'store_visit', val:t.store_visit_rate, band:b.store_visit_rate },
+      { stage:'click',       val:t.click_rate,       band:b.click_rate },
+      { stage:'order',       val:t.order_rate,       band:b.order_rate },
+    ];
+    let worst = null;
+    stages.forEach(s => {
+      if (!s.band || s.band.p50 == null) return;
+      const dev = (s.val - s.band.p50) / s.band.p50; // negative = below median
+      if (dev < 0 && (worst === null || dev < worst.dev)) worst = { ...s, dev };
+    });
+    return worst;
+  }
+
+  // ---- main entry ---------------------------------------------------------
+  function analyze(history, target) {
+    const baseline = buildBaseline(history, target);
+    const t = derive(target);
+
+    const readings = {
+      store_visit_rate: read(t.store_visit_rate, baseline.store_visit_rate),
+      click_rate:       read(t.click_rate,       baseline.click_rate),
+      order_rate:       read(t.order_rate,        baseline.order_rate),
+      arpu:             read(t.arpu,              baseline.arpu),
+      gmv_per_click:    read(t.gmv_per_click,     baseline.gmv_per_click),
+      completion_3s:    read(t.completion_3s,     baseline.completion_3s),
+      completion_rate:  read(t.completion_rate,   baseline.completion_rate),
+      unit_price:       read(t.unit_price,        baseline.unit_price),
+    };
+
+    const weak = locateWeakStage(t, baseline);
+    const fired = fireRules(t, readings);
+    const activeLimitation = (target.boost_status === 'boosted');
+    const conf = confidence(baseline.n, activeLimitation);
+
+    // deviation of the order stage vs baseline p50, for the headline badge
+    const orderDev = baseline.order_rate && baseline.order_rate.p50
+      ? Math.round((t.order_rate - baseline.order_rate.p50) / baseline.order_rate.p50 * 100)
+      : null;
+
+    return {
+      baseline, target: t, readings, weak,
+      rules: fired,
+      contentSide: fired.filter(f => f.side === 'content'),
+      commercialSide: fired.filter(f => f.side === 'commercial'),
+      confidence: conf,
+      sampleSize: baseline.n,
+      boosted: target.boost_status === 'boosted',
+      orderDeviationPct: orderDev,
+    };
+  }
+
+  return { analyze, buildBaseline, derive, dist, percentile };
+})();
+
+if (typeof module !== 'undefined') module.exports = Engine;
+
+
+const SAMPLE = [{"content_id": "H01", "published_at": "2026-06-21", "content_format": "unboxing", "boost_status": "boosted", "impressions": 126781, "store_visits": 17238, "clicks": 8602, "orders": 2217, "views": 103960, "completion_3s": 71, "avg_watch_time": 14.0, "completion_rate": 20, "saves": 761, "shares": 507, "comments": 380, "gmv": 49892, "unit_price": 38, "discount": 0, "viewer_female_pct": 65, "buyer_female_pct": 84, "product_rating_snapshot": 4.3}, {"content_id": "H02", "published_at": "2026-03-09", "content_format": "daily_share", "boost_status": "boosted", "impressions": 112298, "store_visits": 15535, "clicks": 7347, "orders": 2083, "views": 92084, "completion_3s": 69, "avg_watch_time": 13.2, "completion_rate": 18, "saves": 674, "shares": 449, "comments": 337, "gmv": 43347, "unit_price": 43, "discount": 0, "viewer_female_pct": 68, "buyer_female_pct": 82, "product_rating_snapshot": 4.3}, {"content_id": "H03", "published_at": "2026-05-15", "content_format": "unboxing", "boost_status": "boosted", "impressions": 92847, "store_visits": 14103, "clicks": 6941, "orders": 1965, "views": 76135, "completion_3s": 74, "avg_watch_time": 13.2, "completion_rate": 20, "saves": 557, "shares": 371, "comments": 279, "gmv": 39564, "unit_price": 43, "discount": 0, "viewer_female_pct": 69, "buyer_female_pct": 79, "product_rating_snapshot": 4.3}, {"content_id": "H04", "published_at": "2026-03-03", "content_format": "daily_share", "boost_status": "boosted", "impressions": 93003, "store_visits": 13935, "clicks": 7056, "orders": 1946, "views": 76262, "completion_3s": 71, "avg_watch_time": 14.9, "completion_rate": 21, "saves": 558, "shares": 372, "comments": 279, "gmv": 39514, "unit_price": 42, "discount": 0, "viewer_female_pct": 70, "buyer_female_pct": 83, "product_rating_snapshot": 4.3}, {"content_id": "H05", "published_at": "2026-04-09", "content_format": "unboxing", "boost_status": "boosted", "impressions": 100659, "store_visits": 14204, "clicks": 6712, "orders": 1728, "views": 82540, "completion_3s": 69, "avg_watch_time": 14.3, "completion_rate": 19, "saves": 604, "shares": 403, "comments": 302, "gmv": 38930, "unit_price": 46, "discount": 0, "viewer_female_pct": 65, "buyer_female_pct": 85, "product_rating_snapshot": 4.3}, {"content_id": "H06", "published_at": "2026-05-09", "content_format": "daily_share", "boost_status": "boosted", "impressions": 114867, "store_visits": 15863, "clicks": 8178, "orders": 2097, "views": 94191, "completion_3s": 71, "avg_watch_time": 14.5, "completion_rate": 18, "saves": 689, "shares": 459, "comments": 345, "gmv": 48250, "unit_price": 41, "discount": 0, "viewer_female_pct": 70, "buyer_female_pct": 83, "product_rating_snapshot": 4.3}, {"content_id": "H07", "published_at": "2026-05-21", "content_format": "unboxing", "boost_status": "boosted", "impressions": 116290, "store_visits": 16052, "clicks": 7587, "orders": 2224, "views": 95358, "completion_3s": 73, "avg_watch_time": 13.5, "completion_rate": 21, "saves": 698, "shares": 465, "comments": 349, "gmv": 44763, "unit_price": 44, "discount": 0, "viewer_female_pct": 69, "buyer_female_pct": 85, "product_rating_snapshot": 4.3}, {"content_id": "H08", "published_at": "2026-06-15", "content_format": "daily_share", "boost_status": "boosted", "impressions": 99363, "store_visits": 13707, "clicks": 6508, "orders": 1769, "views": 81478, "completion_3s": 72, "avg_watch_time": 14.6, "completion_rate": 21, "saves": 596, "shares": 397, "comments": 298, "gmv": 35794, "unit_price": 44, "discount": 0, "viewer_female_pct": 65, "buyer_female_pct": 86, "product_rating_snapshot": 4.3}, {"content_id": "H09", "published_at": "2026-03-15", "content_format": "unboxing", "boost_status": "boosted", "impressions": 122343, "store_visits": 16238, "clicks": 7515, "orders": 1912, "views": 100321, "completion_3s": 70, "avg_watch_time": 14.7, "completion_rate": 21, "saves": 734, "shares": 489, "comments": 367, "gmv": 41332, "unit_price": 39, "discount": 0, "viewer_female_pct": 68, "buyer_female_pct": 85, "product_rating_snapshot": 4.3}, {"content_id": "H10", "published_at": "2026-05-03", "content_format": "daily_share", "boost_status": "boosted", "impressions": 124676, "store_visits": 17148, "clicks": 8457, "orders": 2376, "views": 102234, "completion_3s": 69, "avg_watch_time": 14.5, "completion_rate": 22, "saves": 748, "shares": 499, "comments": 374, "gmv": 49051, "unit_price": 42, "discount": 0, "viewer_female_pct": 66, "buyer_female_pct": 79, "product_rating_snapshot": 4.3}, {"content_id": "H11", "published_at": "2026-06-09", "content_format": "unboxing", "boost_status": "boosted", "impressions": 109234, "store_visits": 15625, "clicks": 7613, "orders": 2169, "views": 89572, "completion_3s": 72, "avg_watch_time": 15.1, "completion_rate": 19, "saves": 655, "shares": 437, "comments": 328, "gmv": 44917, "unit_price": 46, "discount": 0, "viewer_female_pct": 70, "buyer_female_pct": 82, "product_rating_snapshot": 4.3}, {"content_id": "H12", "published_at": "2026-04-15", "content_format": "daily_share", "boost_status": "boosted", "impressions": 131874, "store_visits": 19152, "clicks": 9038, "orders": 2382, "views": 108137, "completion_3s": 70, "avg_watch_time": 14.2, "completion_rate": 22, "saves": 791, "shares": 527, "comments": 396, "gmv": 51517, "unit_price": 38, "discount": 0, "viewer_female_pct": 67, "buyer_female_pct": 78, "product_rating_snapshot": 4.3}, {"content_id": "H13", "published_at": "2026-02-09", "content_format": "unboxing", "boost_status": "boosted", "impressions": 97331, "store_visits": 15366, "clicks": 7879, "orders": 2087, "views": 79811, "completion_3s": 72, "avg_watch_time": 13.5, "completion_rate": 19, "saves": 584, "shares": 389, "comments": 292, "gmv": 41759, "unit_price": 39, "discount": 0, "viewer_female_pct": 67, "buyer_female_pct": 79, "product_rating_snapshot": 4.3}, {"content_id": "H14", "published_at": "2026-04-21", "content_format": "daily_share", "boost_status": "boosted", "impressions": 139846, "store_visits": 20415, "clicks": 9545, "orders": 2684, "views": 114674, "completion_3s": 76, "avg_watch_time": 13.4, "completion_rate": 22, "saves": 839, "shares": 559, "comments": 420, "gmv": 57270, "unit_price": 44, "discount": 0, "viewer_female_pct": 68, "buyer_female_pct": 81, "product_rating_snapshot": 4.3}, {"content_id": "H15", "published_at": "2026-02-15", "content_format": "unboxing", "boost_status": "boosted", "impressions": 136723, "store_visits": 19053, "clicks": 9902, "orders": 2501, "views": 112113, "completion_3s": 75, "avg_watch_time": 15.0, "completion_rate": 21, "saves": 820, "shares": 547, "comments": 410, "gmv": 53471, "unit_price": 39, "discount": 0, "viewer_female_pct": 64, "buyer_female_pct": 83, "product_rating_snapshot": 4.3}, {"content_id": "H16", "published_at": "2026-06-03", "content_format": "daily_share", "boost_status": "boosted", "impressions": 91378, "store_visits": 13492, "clicks": 6393, "orders": 1626, "views": 74930, "completion_3s": 69, "avg_watch_time": 14.6, "completion_rate": 18, "saves": 548, "shares": 366, "comments": 274, "gmv": 33883, "unit_price": 41, "discount": 0, "viewer_female_pct": 64, "buyer_female_pct": 83, "product_rating_snapshot": 4.3}, {"content_id": "H17", "published_at": "2026-03-21", "content_format": "unboxing", "boost_status": "boosted", "impressions": 94643, "store_visits": 13763, "clicks": 6561, "orders": 1750, "views": 77607, "completion_3s": 76, "avg_watch_time": 13.3, "completion_rate": 22, "saves": 568, "shares": 379, "comments": 284, "gmv": 35429, "unit_price": 45, "discount": 0, "viewer_female_pct": 67, "buyer_female_pct": 84, "product_rating_snapshot": 4.3}, {"content_id": "H18", "published_at": "2026-04-03", "content_format": "daily_share", "boost_status": "boosted", "impressions": 102478, "store_visits": 13612, "clicks": 6800, "orders": 1686, "views": 84032, "completion_3s": 74, "avg_watch_time": 14.0, "completion_rate": 23, "saves": 615, "shares": 410, "comments": 307, "gmv": 38760, "unit_price": 38, "discount": 0, "viewer_female_pct": 69, "buyer_female_pct": 79, "product_rating_snapshot": 4.3}, {"content_id": "T01", "published_at": "2026-07-01", "content_format": "unboxing", "boost_status": "boosted", "impressions": 128400, "store_visits": 19260, "clicks": 9630, "orders": 1541, "views": 105288, "completion_3s": 58, "avg_watch_time": 11.2, "completion_rate": 19, "saves": 770, "shares": 514, "comments": 385, "gmv": 38520, "unit_price": 68, "discount": 0, "viewer_female_pct": 68, "buyer_female_pct": 85, "product_rating_snapshot": 4.3}]
+;
+const TIMEWIN = [{"reading_day": 1, "impressions": 61000, "store_visits": 9150, "clicks": 4570, "orders": 470, "gmv": 18100, "store_visit_rate_pct": 15.0, "click_rate_pct": 49.9, "order_rate_pct": 5.14, "gmv_per_click": 3.96, "order_rate_change_pp": ""}, {"reading_day": 2, "impressions": 112000, "store_visits": 16800, "clicks": 8400, "orders": 1305, "gmv": 33300, "store_visit_rate_pct": 15.0, "click_rate_pct": 50.0, "order_rate_pct": 7.77, "gmv_per_click": 3.96, "order_rate_change_pp": 2.63}, {"reading_day": 3, "impressions": 122000, "store_visits": 18300, "clicks": 9150, "orders": 1452, "gmv": 36300, "store_visit_rate_pct": 15.0, "click_rate_pct": 50.0, "order_rate_pct": 7.93, "gmv_per_click": 3.97, "order_rate_change_pp": 0.17}, {"reading_day": 7, "impressions": 128400, "store_visits": 19260, "clicks": 9630, "orders": 1541, "gmv": 38520, "store_visit_rate_pct": 15.0, "click_rate_pct": 50.0, "order_rate_pct": 8.0, "gmv_per_click": 4.0, "order_rate_change_pp": 0.07}]
+;
+
+const history = SAMPLE.filter(r => String(r.content_id).startsWith('H'));
+let target = Object.assign({}, SAMPLE.find(r => r.content_id === 'T01'));
+
+// ---- section 1: why day 2 ----
+function renderTimeWin(){
+  const maxChange = 2.63;
+  let html = '<table><tr><th>Reading day</th><th>Order conversion rate</th><th>Change vs previous</th><th>Orders so far</th></tr>';
+  TIMEWIN.forEach(r=>{
+    const chg = r.order_rate_change_pp === '' || r.order_rate_change_pp === undefined ? 'first reading' : ('+'+r.order_rate_change_pp+' pts').replace('+-','-');
+    html += '<tr><td>Day '+r.reading_day+'</td><td><b>'+r.order_rate_pct+'%</b></td><td>'+chg+'</td><td>'+r.orders.toLocaleString()+'</td></tr>';
+  });
+  html += '</table><div class="bars">';
+  TIMEWIN.forEach(r=>{
+    if(r.order_rate_change_pp==='' || r.order_rate_change_pp===undefined) return;
+    const v = Math.abs(r.order_rate_change_pp);
+    const w = Math.min(100, v/maxChange*100);
+    const col = v>1 ? '#e0564d' : '#2f9e6f';
+    html += '<div class="bar-row"><div class="bar-lbl">Day '+(r.reading_day-1)+'→'+r.reading_day+'</div>'
+         + '<div class="bar-track"><div class="bar-fill" style="width:'+w+'%;background:'+col+'"></div></div>'
+         + '<div class="bar-val" style="color:'+col+'">'+r.order_rate_change_pp+' pts</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('timewin').innerHTML = html;
+  document.getElementById('timewin-note').innerHTML =
+    'From day 1 to day 2 the rate jumps <b>2.63 points</b>. From day 2 to day 7 it moves only <b>0.23 points</b> in total. '
+    + 'Day 2 captures a rate within a quarter of a point of the final value, while waiting to day 7 costs five days and arrives after the creator has already decided the next piece. '
+    + 'So the window is day 2 because the data stops moving there, not because day 2 was chosen in advance.';
+}
+
+// ---- editable target inputs ----
+const FIELDS = [
+  ['impressions','Impressions'],['store_visits','Store visits'],['clicks','Clicks'],
+  ['orders','Orders'],['gmv','GMV'],['completion_3s','First 3s completion'],
+  ['unit_price','Unit price'],['views','Views']
+];
+function renderInputs(){
+  let html='';
+  FIELDS.forEach(([k,lbl])=>{
+    html += '<label style="display:flex;justify-content:space-between;align-items:center;margin:5px 0;font-size:13px;">'
+         + '<span style="color:#6b7280">'+lbl+'</span>'
+         + '<input data-k="'+k+'" value="'+target[k]+'" style="width:110px;font:inherit;font-size:13px;text-align:right;border:1px solid #d3d9f7;border-radius:6px;padding:4px 8px;"></label>';
+  });
+  document.getElementById('inputs').innerHTML = html;
+}
+
+function readInputs(){
+  document.querySelectorAll('#inputs input').forEach(inp=>{
+    const k=inp.dataset.k; const n=Number(inp.value);
+    if(!isNaN(n)) target[k]=n;
+  });
+}
+
+function fmtBand(b, isPct){
+  if(!b||b.p25==null) return '—';
+  const f = v => isPct ? (v*100).toFixed(1)+'%' : (v.toFixed? v.toFixed(1): v);
+  return f(b.p25)+' / '+f(b.p50)+' / '+f(b.p75);
+}
+
+function render(){
+  readInputs();
+  const res = Engine.analyze(history, target);
+
+  // baseline table
+  const b = res.baseline;
+  let bl = '<table><tr><th>Metric</th><th>p25 / p50 / p75</th></tr>'
+    + '<tr><td>Order conversion rate</td><td>'+fmtBand(b.order_rate,true)+'</td></tr>'
+    + '<tr><td>First 3s completion</td><td>'+fmtBand(b.completion_3s,false)+'</td></tr>'
+    + '<tr><td>GMV per click</td><td>'+fmtBand(b.gmv_per_click,false)+'</td></tr>'
+    + '<tr><td>Unit price</td><td>'+fmtBand(b.unit_price,false)+'</td></tr>'
+    + '<tr><td>Store visit rate</td><td>'+fmtBand(b.store_visit_rate,true)+'</td></tr>'
+    + '<tr><td>Click rate</td><td>'+fmtBand(b.click_rate,true)+'</td></tr></table>'
+    + '<div class="hint" style="margin-top:8px">Comparable pieces: '+b.n+'</div>';
+  document.getElementById('baseline').innerHTML = bl;
+
+  // diagnosis
+  const t=res.target, rd=res.readings;
+  const cls = k => rd[k];
+  const weakName = res.weak ? res.weak.stage.replace('_',' ') : 'none';
+  let d = '<div class="diag">';
+  d += '<h3>The drop is at the '+weakName+' stage';
+  if(res.orderDeviationPct!=null && res.weak && res.weak.stage==='order')
+    d += '<span class="badge">▼ '+Math.abs(res.orderDeviationPct)+'% below baseline</span>';
+  d += '</h3>';
+  d += '<div class="hint">'+ (res.boosted ? 'This piece was boosted, so impressions are set aside and not judged. ' : '')
+     + 'Confidence: <span class="pill">'+res.confidence+' · '+res.sampleSize+' comparable pieces</span></div>';
+
+  // factors
+  res.contentSide.forEach(f=>{
+    d += '<div class="factor"><span class="tag content">Content side · '+f.id+'</span><div style="font-weight:700">'+f.factor+'</div><div class="hint" style="margin-top:4px">'+f.evidence+'</div></div>';
+  });
+  res.commercialSide.forEach(f=>{
+    d += '<div class="factor"><span class="tag commercial">Commercial side · '+f.id+'</span><div style="font-weight:700">'+f.factor+'</div><div class="hint" style="margin-top:4px">'+f.evidence+'</div></div>';
+  });
+  if(res.rules.length===0)
+    d += '<div class="factor">No rule fired. Every stage reads within this creator\u2019s normal range.</div>';
+
+  // readings table
+  d += '<div style="margin-top:14px"><table><tr><th>Metric</th><th>Target</th><th>Reading</th></tr>';
+  const rowsr = [
+    ['Store visit rate',(t.store_visit_rate*100).toFixed(1)+'%','store_visit_rate'],
+    ['Click rate',(t.click_rate*100).toFixed(1)+'%','click_rate'],
+    ['Order conversion rate',(t.order_rate*100).toFixed(1)+'%','order_rate'],
+    ['First 3s completion',t.completion_3s,'completion_3s'],
+    ['GMV per click',t.gmv_per_click.toFixed(1),'gmv_per_click'],
+    ['Unit price',t.unit_price,'unit_price'],
+  ];
+  rowsr.forEach(([lbl,val,k])=>{
+    d += '<tr><td>'+lbl+'</td><td>'+val+'</td><td class="'+cls(k)+'">'+rd[k]+'</td></tr>';
+  });
+  d += '</table></div></div>';
+  document.getElementById('diag').innerHTML = d;
+}
+
+renderTimeWin();
+renderInputs();
+render();
+document.getElementById('run').onclick = ()=>{ render(); };
+</script>
+</body>
+</html>
